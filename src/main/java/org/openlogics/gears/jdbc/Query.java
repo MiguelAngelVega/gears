@@ -1,5 +1,5 @@
 /*
- *     gears
+ * gears
  *     http://www.open-logics.com
  *     Copyright (C) 2012, OpenLogics
  *
@@ -17,18 +17,22 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.openlogics.gears.text;
+package org.openlogics.gears.jdbc;
 
 /**
+ * Query object is delegated to evaluate the queryString against parameters
  * @author Miguel Vega
- * @version $Id: ELEvaluator.java 0, 2012-09-29 11:16 mvega $
+ * @version $Id: Query.java 0, 2012-10-05 4:03 PM mvega $
  */
-public interface ELEvaluator<U, V> {
-    /**
-     * Evaluates the given text and process parameters with given context.
-     * @param textToEvaluate
-     * @param context
-     * @return
-     */
-    public U evaluate(String textToEvaluate, V context);
+public class Query {
+    private String queryString;
+
+    public Query(String queryString){
+        this.queryString = queryString;
+    }
+
+    @Override
+    public String toString(){
+        return queryString;
+    }
 }

@@ -25,10 +25,13 @@ import java.util.Dictionary;
 import java.util.Map;
 
 /**
+ * This class evaluates a Expression Language dot separated, where each part of the string
+ * can be the requested value.
+ *
  * @author Miguel Vega
- * @version $Id: ParamStringELvaluator.java 0, 2012-09-29 11:22 mvega $
+ * @version $Id: StringExpressionTransformer.java 0, 2012-09-29 11:22 mvega $
  */
-public class ParamStringELvaluator implements ELEvaluator<Object, Object> {
+public class StringExpressionTransformer implements Transformer<String, Object> {
     static final String ATTRIBUTE_SEPARATOR = "\\.";
 
     /*public Object evaluate(InputStream inputStream, Object context) {
@@ -53,8 +56,19 @@ public class ParamStringELvaluator implements ELEvaluator<Object, Object> {
         }
     }*/
 
+    /**
+     * Need to evaluate the four possibilities:
+     * 1. dictionary.attribute...
+     * 2. map.attribute...
+     * 3. bean.param...
+     * 4. primitive
+     *
+     * @param textToEvaluate
+     * @param context
+     * @return
+     */
     @Override
-    public Object evaluate(String textToEvaluate, Object context) {
+    public <T> T evaluate(String textToEvaluate, Object context) {
         final String[] tokens = textToEvaluate.split(ATTRIBUTE_SEPARATOR);
         if (tokens.length==0) {
             //simply return context
@@ -65,19 +79,19 @@ public class ParamStringELvaluator implements ELEvaluator<Object, Object> {
             String s = tokens[0];
             int offset = s.length() + 1;
             //make retrieved value the new context
-            return evaluate(textToEvaluate.substring(offset, textToEvaluate.length()), getFinalValue(context, s));
+            return (T)evaluate(textToEvaluate.substring(offset, textToEvaluate.length()), getFinalValue(context, s));
         }
     }
 
-    private Object getFinalValue(Object context, String attr) {
+    private <T> T getFinalValue(Object context, String attr) {
         if (isPrimitive(context)) {
-            return context;
+            return (T)context;
         }
         else if (context instanceof Map) {
-            return ((Map) context).get(attr);
+            return (T)((Map) context).get(attr);
         }
         else if (context instanceof Dictionary) {
-            return ((Dictionary) context).get(attr);
+            return (T)((Dictionary) context).get(attr);
         }
         //use the reflection to retrieve the value
         String getter = null;
@@ -100,7 +114,7 @@ public class ParamStringELvaluator implements ELEvaluator<Object, Object> {
                     throw new IllegalArgumentException("Can not reach method.", e);
                 }
             }
-            return method.invoke(context);
+            return (T)method.invoke(context);
         } catch (Exception ex) {
             throw new IllegalArgumentException("Unable to reach getter method for variable '" + attr + "' in object of type '" + context.getClass() + "'.", ex);
         }

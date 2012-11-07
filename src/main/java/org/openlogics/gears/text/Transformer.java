@@ -17,18 +17,19 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.openlogics.gears.jdbc;
+package org.openlogics.gears.text;
 
 /**
- * When using a EL, the values is retrieved to a vistor.
- * If a common value will be given, can use the Generic to make it simpler.
+ * This class aids to transform a text into another object
  * @author Miguel Vega
- * @version $Id: ReadParameterVisitor.java 0, 2012-10-05 01:13 mvega $
+ * @version $Id: Transformer.java 0, 2012-09-29 11:16 mvega $
  */
-interface ReadParameterVisitor<T> {
+public interface Transformer<U, V> {
     /**
-     *
-     * @param obj the parameter retrieved from the Object provided to the ELHandler.
+     * Evaluates the given source and process parameters in given context.
+     * @param source
+     * @param context
+     * @return result of the transformation
      */
-    void visit(T obj);
+    public <T> T evaluate(U source, V context);
 }
