@@ -1,5 +1,5 @@
 /*
- *     JavaTools
+ *     gears
  *     http://www.open-logics.com
  *     Copyright (C) 2012, OpenLogics
  *
@@ -17,18 +17,19 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package bean;
-
-import lombok.Data;
-
-import java.sql.Timestamp;
+package org.openlogics.gears.text;
 
 /**
+ * This class aids to transform a text into another object
  * @author Miguel Vega
- * @version $Id: Student.java 0, 2012-09-29 12:00 mvega $
+ * @version $Id: ExpressionTransformer.java 0, 2012-09-29 11:16 mvega $
  */
-@Data
-public class Student extends Person{
-    private float rate;
-    private Timestamp addDate;
+public interface ExpressionTransformer<U, V> {
+    /**
+     * Evaluates the given source and process parameters in given context.
+     * @param source
+     * @param context
+     * @return result of the transformation
+     */
+    public <T> T transform(U source, V context);
 }

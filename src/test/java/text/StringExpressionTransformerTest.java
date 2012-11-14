@@ -25,7 +25,7 @@ import bean.Teacher;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Assert;
 import org.junit.Test;
-import org.openlogics.gears.text.StringExpressionTransformer;
+import org.openlogics.gears.text.ExpressionTransformerImpl;
 
 import java.util.Hashtable;
 import java.util.Map;
@@ -40,59 +40,59 @@ import static org.junit.Assert.assertTrue;
 public class StringExpressionTransformerTest {
     @Test
     public void testPrimitiveType(){
-        StringExpressionTransformer ele = new StringExpressionTransformer();
-        Object o = ele.evaluate("", 1);
+        ExpressionTransformerImpl ele = new ExpressionTransformerImpl();
+        Object o = ele.transform("", 1);
         Assert.assertEquals(o, 1);
     }
 
     @Test
     public void testDictionary(){
-        StringExpressionTransformer ele = new StringExpressionTransformer();
+        ExpressionTransformerImpl ele = new ExpressionTransformerImpl();
         Hashtable<String, String> in = new Hashtable<String, String>();
         in.put("name", "mike");
-        Object o = ele.evaluate("name", in);
+        Object o = ele.transform("name", in);
         Assert.assertEquals(o, "mike");
     }
 
     @Test
     public void testMapType(){
-        StringExpressionTransformer ele = new StringExpressionTransformer();
+        ExpressionTransformerImpl ele = new ExpressionTransformerImpl();
         Map<String, String> in = new ImmutableMap.Builder<String,String>().put("name", "mike").build();
-        String o = ele.evaluate("name", in);
+        String o = ele.transform("name", in);
         Assert.assertEquals(o, "mike");
     }
 
     @Test
     public void testBeanFromMap(){
-        StringExpressionTransformer ele = new StringExpressionTransformer();
+        ExpressionTransformerImpl ele = new ExpressionTransformerImpl();
         Student st = new Student();
         st.setFname("mike");
         Map<String, Student> in = new ImmutableMap.Builder<String,Student>().put("st", st).build();
-        Student o = ele.evaluate("st", in);
+        Student o = ele.transform("st", in);
         Assert.assertEquals(o.getFname(), "mike");
     }
 
     @Test
     public void testPrimitiveFromBean(){
-        StringExpressionTransformer ele = new StringExpressionTransformer();
+        ExpressionTransformerImpl ele = new ExpressionTransformerImpl();
         ClassRoom cr = new ClassRoom();
         Teacher t = new Teacher();
         t.setFname("Juan");
         t.setLname("Perez");
         cr.setTeacher(t);
-        Object o = ele.evaluate("teacher.fname", cr);
+        Object o = ele.transform("teacher.fname", cr);
         Assert.assertEquals(o, "Juan");
     }
 
     @Test
     public void testBenaFromBean(){
-        StringExpressionTransformer ele = new StringExpressionTransformer();
+        ExpressionTransformerImpl ele = new ExpressionTransformerImpl();
         ClassRoom cr = new ClassRoom();
         Teacher t = new Teacher();
         t.setFname("Juan");
         t.setLname("Perez");
         cr.setTeacher(t);
-        Teacher o = (Teacher) ele.evaluate("teacher", cr);
+        Teacher o = (Teacher) ele.transform("teacher", cr);
         assertTrue(o instanceof Teacher);
         assertEquals("Juan", o.getFname());
     }

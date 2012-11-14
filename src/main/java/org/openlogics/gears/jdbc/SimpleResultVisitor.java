@@ -27,12 +27,13 @@ import java.sql.SQLException;
  * @version $Id: SimpleResultVisitor.java 0, 2012-10-05 01:21 mvega $
  */
 public interface SimpleResultVisitor<T> {
-        /**
-         * This method executes a query and may return an object, this return
-         * parameter is then retrieved by the {@link DataStore#select} method.
-         * @param rs
-         * @return
-         * @throws SQLException
-         */
-        public T visit(ResultSet rs)throws SQLException;
+    /**
+     * This method executes a query and may return an object, this return
+     * parameter is then retrieved by the {@link DataStore#select} method.
+     *
+     * @param rs
+     * @return
+     * @throws SQLException
+     */
+    public T visit(ResultSet rs) throws SQLException;
 }

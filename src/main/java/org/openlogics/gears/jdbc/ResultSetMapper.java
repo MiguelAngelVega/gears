@@ -1,5 +1,5 @@
 /*
- *     gears
+ * gears
  *     http://www.open-logics.com
  *     Copyright (C) 2012, OpenLogics
  *
@@ -17,19 +17,12 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.openlogics.gears.text;
+package org.openlogics.gears.jdbc;
 
 /**
- * This class aids to transform a text into another object
  * @author Miguel Vega
- * @version $Id: Transformer.java 0, 2012-09-29 11:16 mvega $
+ * @version $Id: ResultSetMapper.java 0, 2012-11-14 2:55 PM mvega $
  */
-public interface Transformer<U, V> {
-    /**
-     * Evaluates the given source and process parameters in given context.
-     * @param source
-     * @param context
-     * @return result of the transformation
-     */
-    public <T> T evaluate(U source, V context);
+public class ResultSetMapper {
+
 }

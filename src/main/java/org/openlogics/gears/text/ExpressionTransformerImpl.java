@@ -19,6 +19,8 @@
 
 package org.openlogics.gears.text;
 
+import com.google.common.primitives.Primitives;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Dictionary;
@@ -29,13 +31,13 @@ import java.util.Map;
  * can be the requested value.
  *
  * @author Miguel Vega
- * @version $Id: StringExpressionTransformer.java 0, 2012-09-29 11:22 mvega $
+ * @version $Id: ExpressionTransformerImpl.java 0, 2012-09-29 11:22 mvega $
  */
-public class StringExpressionTransformer implements Transformer<String, Object> {
+public class ExpressionTransformerImpl implements ExpressionTransformer<String, Object> {
     static final String ATTRIBUTE_SEPARATOR = "\\.";
 
-    /*public Object evaluate(InputStream inputStream, Object context) {
-        if (isPrimitive(context)) {
+    /*public Object transform(InputStream inputStream, Object context) {
+        if (isWrapperType(context)) {
             return context;
         }
 
@@ -52,12 +54,12 @@ public class StringExpressionTransformer implements Transformer<String, Object> 
         } else {
             int offset = token.length() + 1;
             //make retrieved value the new context
-            return evaluate(inputStream, getFinalValue(context, token));
+            return transform(inputStream, getFinalValue(context, token));
         }
     }*/
 
     /**
-     * Need to evaluate the four possibilities:
+     * Need to transform the four possibilities:
      * 1. dictionary.attribute...
      * 2. map.attribute...
      * 3. bean.param...
@@ -68,7 +70,7 @@ public class StringExpressionTransformer implements Transformer<String, Object> 
      * @return
      */
     @Override
-    public <T> T evaluate(String textToEvaluate, Object context) {
+    public <T> T transform(String textToEvaluate, Object context) {
         final String[] tokens = textToEvaluate.split(ATTRIBUTE_SEPARATOR);
         if (tokens.length==0) {
             //simply return context
@@ -79,12 +81,12 @@ public class StringExpressionTransformer implements Transformer<String, Object> 
             String s = tokens[0];
             int offset = s.length() + 1;
             //make retrieved value the new context
-            return (T)evaluate(textToEvaluate.substring(offset, textToEvaluate.length()), getFinalValue(context, s));
+            return (T) transform(textToEvaluate.substring(offset, textToEvaluate.length()), getFinalValue(context, s));
         }
     }
 
     private <T> T getFinalValue(Object context, String attr) {
-        if (isPrimitive(context)) {
+        if (isWrapperType(context)) {
             return (T)context;
         }
         else if (context instanceof Map) {
@@ -120,9 +122,13 @@ public class StringExpressionTransformer implements Transformer<String, Object> 
         }
     }
 
-    private boolean isPrimitive(Object obj) {
-        return obj instanceof Number || obj instanceof String ||
-                obj instanceof Boolean;
+    /**
+     * Use Guava to determine if object is primitive
+     * @param obj
+     * @return
+     */
+    private boolean isWrapperType(Object obj) {
+        return Primitives.isWrapperType(obj.getClass());
     }
 
     public static String getGetterName(Field field) {

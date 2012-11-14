@@ -19,15 +19,16 @@
 
 package org.openlogics.gears.jdbc;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
+import org.apache.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -38,9 +39,93 @@ public abstract class DataStore {
     private Connection connection;
     private boolean autoClose = true;
     private boolean autoCommit = true;
+    /*
+     * transactionIsolation, allows to define the isolation level for the transaction,
+     * useful when need to lock rows from database.
+     */
+    private int transactionIsolation;
+
+    protected Logger logger;
+
+    private String schema;
+
+    DataStore() {
+        logger = Logger.getLogger(getClass());
+    }
+
+    public <T> T select(Query query, SimpleResultVisitor<? extends T> visitor) throws SQLException {
+        //a simple list to hold data about query
+        List params = Lists.newLinkedList();
+        try {
+            String queryString = query.evaluateQueryString(this, params);
+            PreparedStatement ps = prepareStatement(queryString.toString(), params);
+            return this.select(ps, visitor);
+        } finally {
+            params.clear();
+        }
+    }
+
+    /**
+     * @param preparedSt
+     * @param handler
+     * @param <T>
+     * @return
+     * @throws SQLException
+     */
+    public <T> T select(PreparedStatement preparedSt, SimpleResultVisitor<? extends T> handler) throws SQLException {
+        logger.debug("Attempting to execute a preparedStatement QUERY: " + preparedSt + ", mapped to ");
+        ResultSet rs = null;
+        try {
+            rs = preparedSt.executeQuery();
+            return handler.visit(rs);
+        } finally {
+            if (rs != null) rs.close();
+            DbUtils.close(preparedSt);
+            if (isAutoClose()) {
+                closeConnection();
+            }
+        }
+    }
+
+    /**
+     * @param query
+     * @param resultType
+     * @param visitor
+     */
+    public void select(Query query, Class<?> resultType, ObjectResultVisitor<?> visitor) {
+
+    }
 
     public <T> T select() {
         return null;
+    }
+
+    /**
+     * Creates a new {@link PreparedStatement} object
+     *
+     * @param preparedSql
+     * @param params
+     * @return
+     * @throws SQLException
+     */
+    public PreparedStatement prepareStatement(String preparedSql, List params) throws SQLException {
+        Connection conn = acquireConnection();
+        PreparedStatement preparedSt = conn.prepareStatement(preparedSql);
+        for (int i = 0; i < params.size(); i++) {
+            Object object = params.get(i);
+            preparedSt.setObject(i + 1, object);
+        }
+        return preparedSt;
+    }
+
+    public synchronized void setAutoClose(boolean autoClose) {
+        logger.warn("Attempting to modify the connection AUTO CLOSE type to: " + autoClose);
+        this.autoClose = autoClose;
+    }
+
+    public synchronized void setAutoCommit(boolean autoCommit) {
+        logger.warn("Attempting to modify the connection AUTO COMMIT type to: " + autoCommit);
+        this.autoCommit = autoCommit;
     }
 
     /**
@@ -48,17 +133,13 @@ public abstract class DataStore {
      *
      * @return database connection
      */
-    protected abstract Connection openConnection() throws SQLException;
+    protected abstract Connection acquireConnection() throws SQLException;
 
     /**
      * @throws SQLException
      */
     public void commitAndClose() throws SQLException {
-        try {
-            commit();
-        } finally {
-            DbUtils.close(connection);
-        }
+        DbUtils.commitAndClose(connection);
     }
 
     /**
@@ -72,6 +153,7 @@ public abstract class DataStore {
 
     /**
      * rollback all changes
+     *
      * @throws SQLException
      */
     public void rollBack() throws SQLException {
@@ -80,16 +162,13 @@ public abstract class DataStore {
     }
 
     /**
+     * This method is always called after any transaction is executed.
+     *
      * @throws SQLException
      */
-    protected void closeConnection() throws SQLException {
-        if (autoCommit) {
-            DbUtils.commitAndClose(connection);
-        } else {
-            if (autoClose) {
-                DbUtils.close(connection);
-            }
-        }
+    public void closeConnection() throws SQLException {
+        DbUtils.close(connection);
+        this.connection = null;
     }
 
     /**
@@ -102,7 +181,7 @@ public abstract class DataStore {
      * @param <T>
      * @return what visitor decides to return
      */
-    public <T> T select(Query query, final SimpleResultVisitor<T> resultVisitor, Object... parameters) throws SQLException {
+    public <T> T select(String query, final SimpleResultVisitor<T> resultVisitor, Object... parameters) throws SQLException {
 
         try {
             QueryRunner runner = new QueryRunner();
@@ -116,5 +195,29 @@ public abstract class DataStore {
             closeConnection();
         }
 
+    }
+
+    public String getSchema() {
+        return schema;
+    }
+
+    public void setSchema(String schema) {
+        this.schema = schema;
+    }
+
+    public boolean isAutoClose() {
+        return autoClose;
+    }
+
+    public boolean isAutoCommit() {
+        return autoCommit;
+    }
+
+    public int getTransactionIsolation() {
+        return transactionIsolation;
+    }
+
+    public void setTransactionIsolation(int transactionIsolation) {
+        this.transactionIsolation = transactionIsolation;
     }
 }

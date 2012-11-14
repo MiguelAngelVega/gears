@@ -1,5 +1,5 @@
 /*
- *     JavaTools
+ * gears
  *     http://www.open-logics.com
  *     Copyright (C) 2012, OpenLogics
  *
@@ -17,18 +17,29 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package bean;
+package jdbc;
 
-import lombok.Data;
+import junit.framework.Assert;
+import org.junit.Test;
+import org.openlogics.gears.jdbc.DataStore;
+import org.openlogics.gears.jdbc.JdbcDataStore;
+import org.openlogics.gears.jdbc.Query;
 
-import java.sql.Timestamp;
+import static junit.framework.Assert.assertEquals;
 
 /**
  * @author Miguel Vega
- * @version $Id: Student.java 0, 2012-09-29 12:00 mvega $
+ * @version $Id: QueryTest.java 0, 2012-11-14 5:49 PM mvega $
  */
-@Data
-public class Student extends Person{
-    private float rate;
-    private Timestamp addDate;
+public class QueryTest extends DefaultTest {
+    @Test
+    public void simpleQueryTest() {
+        DataStore ds = new JdbcDataStore(basicDataSource);
+
+        Query<String> query = new Query<String>("select * from dis_students");
+        String result = query.toString();
+        assertEquals("select * from dis_students", result);
+
+        System.out.println("Result="+result);
+    }
 }
