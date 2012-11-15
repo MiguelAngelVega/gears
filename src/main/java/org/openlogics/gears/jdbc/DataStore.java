@@ -89,11 +89,29 @@ public abstract class DataStore {
 
     /**
      * @param query
-     * @param resultType
      * @param visitor
      */
-    public void select(Query query, Class<?> resultType, ObjectResultVisitor<?> visitor) {
+    public <T> void select(Query query, ObjectResultVisitor<T> visitor) {
+        List params = Lists.newLinkedList();
+        ResultSetMapper mapper = new ResultSetMapper();
+        String queryString = mapper.evaluateQueryString(complexQuery, provider, params);
+        PreparedStatement ps = prepareStatement(queryString.toString(), params);
+        try {
+            select(ps, new ResultVisitor<T>() {
 
+                public T visit(ResultSet rs, DataStore conn) throws SQLException {
+                    while (rs.next()) {
+                        T obj = resultMapper.mapResultSet(rs, requiredType);
+                        handler.visit(obj, conn, rs);
+                    }
+                    return null;
+                }
+            });
+        } catch (SQLException x) {
+            throw new SQLException("An error occurred while attempting to make a query.", x);
+        } finally {
+            params.clear();
+        }
     }
 
     public <T> T select() {
