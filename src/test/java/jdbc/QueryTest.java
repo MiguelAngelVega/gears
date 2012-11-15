@@ -20,6 +20,7 @@
 package jdbc;
 
 import junit.framework.Assert;
+import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.openlogics.gears.jdbc.DataStore;
 import org.openlogics.gears.jdbc.JdbcDataStore;
@@ -32,6 +33,7 @@ import static junit.framework.Assert.assertEquals;
  * @version $Id: QueryTest.java 0, 2012-11-14 5:49 PM mvega $
  */
 public class QueryTest extends DefaultTest {
+    Logger logger = Logger.getLogger(QueryTest.class);
     @Test
     public void simpleQueryTest() {
         DataStore ds = new JdbcDataStore(basicDataSource);
@@ -39,7 +41,6 @@ public class QueryTest extends DefaultTest {
         Query<String> query = new Query<String>("select * from dis_students");
         String result = query.toString();
         assertEquals("select * from dis_students", result);
-
-        System.out.println("Result="+result);
+        logger.info("Result="+result);
     }
 }

@@ -19,9 +19,9 @@
   -->
 
 <dataset>
-  <dis_students std_fname="MIGUEL" std_lname="VEGA" std_add_date="CURRENT_TIMESTAMP()"/>
-  <dis_students std_fname="MARCELA" std_lname="GOMEZ" std_add_date="CURRENT_TIMESTAMP()"/>
-  <dis_students std_fname="MARCELO" std_lname="MORALES" std_add_date="CURRENT_TIMESTAMP()"/>
-  <dis_students std_fname="JSON" std_lname="SANCHEZ" std_add_date="CURRENT_TIMESTAMP()"/>
-  <dis_students std_fname="JUAN" std_lname="PEREZ" std_add_date="CURRENT_TIMESTAMP()"/>
+  <DIS_STUDENTS STD_FNAME="MIGUEL" STD_LNAME="VEGA" STD_ADD_DATE="2004-07-07 15:38:49.0"/>
+  <DIS_STUDENTS STD_FNAME="MARCELA" STD_LNAME="GOMEZ" STD_ADD_DATE="2004-07-07 15:38:49.0"/>
+  <DIS_STUDENTS STD_FNAME="MARCELO" STD_LNAME="MORALES" STD_ADD_DATE="2004-07-07 15:38:49.0"/>
+  <DIS_STUDENTS STD_FNAME="JSON" STD_LNAME="SANCHEZ" STD_ADD_DATE="2004-07-07 15:38:49.0"/>
+  <DIS_STUDENTS STD_FNAME="JUAN" STD_LNAME="PEREZ" STD_ADD_DATE="2004-07-07 15:38:49.0"/>
 </dataset>

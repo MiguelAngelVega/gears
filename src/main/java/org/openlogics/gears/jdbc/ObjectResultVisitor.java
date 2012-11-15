@@ -29,7 +29,6 @@ import java.sql.SQLException;
  */
 public interface ObjectResultVisitor<S> {
     /**
-     * TODO, this is too dirty, must create a way to don't return the resultset anymore.
      * This method will return the object created from query results.
      * @param result an object as result from query
      */
