@@ -24,5 +24,4 @@ package org.openlogics.gears.jdbc;
  * @version $Id: ResultSetMapper.java 0, 2012-11-14 2:55 PM mvega $
  */
 public class ResultSetMapper {
-
 }
