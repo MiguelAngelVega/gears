@@ -1,5 +1,5 @@
 /*
- *     gears
+ * gears
  *     http://www.open-logics.com
  *     Copyright (C) 2012, OpenLogics
  *
@@ -17,23 +17,23 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.openlogics.gears.jdbc;
+package org.openlogics.gears.jdbc.annotations;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.lang.annotation.*;
 
 /**
  * @author Miguel Vega
- * @version $Id: SimpleResultVisitor.java 0, 2012-10-05 01:21 mvega $
+ * @version $Id: Column.java 0, 2012-11-15 5:14 PM mvega $
  */
-public interface SimpleResultVisitor<T> {
+@Documented
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Column {
     /**
-     * This method executes a query and may return an object, this return
-     * parameter is then retrieved by the {@link DataStore#select} method.
-     *
-     * @param rs
+     * the attribute name for an element's attribute object
      * @return
-     * @throws SQLException
      */
-    public T visit(ResultSet rs) throws SQLException;
+    public String value() default "";
+    public boolean primaryKey() default false;
+    public boolean serial() default false;
 }

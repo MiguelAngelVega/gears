@@ -84,7 +84,7 @@ public class SQLExpressionTransformer implements ExpressionTransformer<String, O
     }
 
     /**
-     * This method is exclusively developed for the {@link org.openlogics.gears.jdbc.ResultSetMapper}
+     * This method is exclusively developed for the {@link org.openlogics.gears.jdbc.map.BeanResultHandler}
      * class to make the query builder dynamic. So when using prepared
      * statements, must retrieve the values from the EL in QUERY and replace
      * them by '?' symbols in query string, and then add these values to the

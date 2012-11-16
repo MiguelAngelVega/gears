@@ -24,6 +24,7 @@ import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.log4j.Logger;
+import org.openlogics.gears.jdbc.map.BeanResultHandler;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -53,7 +54,7 @@ public abstract class DataStore {
         logger = Logger.getLogger(getClass());
     }
 
-    public <T> T select(Query query, SimpleResultVisitor<? extends T> visitor) throws SQLException {
+    public <T> T select(Query query, ResultVisitor<? extends T> visitor) throws SQLException {
         //a simple list to hold data about query
         List params = Lists.newLinkedList();
         try {
@@ -72,7 +73,7 @@ public abstract class DataStore {
      * @return
      * @throws SQLException
      */
-    public <T> T select(PreparedStatement preparedSt, SimpleResultVisitor<? extends T> handler) throws SQLException {
+    public <T> T select(PreparedStatement preparedSt, ResultVisitor<? extends T> handler) throws SQLException {
         logger.debug("Attempting to execute a preparedStatement QUERY: " + preparedSt + ", mapped to ");
         ResultSet rs = null;
         try {
@@ -91,15 +92,16 @@ public abstract class DataStore {
      * @param query
      * @param visitor
      */
-    public <T> void select(Query query, ObjectResultVisitor<T> visitor) {
+    public <T> void select(Query query, ObjectResultVisitor<? extends T> visitor) throws SQLException {
         List params = Lists.newLinkedList();
-        ResultSetMapper mapper = new ResultSetMapper();
-        String queryString = mapper.evaluateQueryString(complexQuery, provider, params);
+        BeanResultHandler toBeanResultHandler = new BeanResultHandler();
+        String queryString = query.evaluateQueryString(this, params);
         PreparedStatement ps = prepareStatement(queryString.toString(), params);
-        try {
-            select(ps, new ResultVisitor<T>() {
 
-                public T visit(ResultSet rs, DataStore conn) throws SQLException {
+        try {
+            select(ps, new ResultVisitor() {
+                @Override
+                public Object visit(ResultSet rs) throws SQLException {
                     while (rs.next()) {
                         T obj = resultMapper.mapResultSet(rs, requiredType);
                         handler.visit(obj, conn, rs);
@@ -199,7 +201,7 @@ public abstract class DataStore {
      * @param <T>
      * @return what visitor decides to return
      */
-    public <T> T select(String query, final SimpleResultVisitor<T> resultVisitor, Object... parameters) throws SQLException {
+    public <T> T select(String query, final ResultVisitor<T> resultVisitor, Object... parameters) throws SQLException {
 
         try {
             QueryRunner runner = new QueryRunner();

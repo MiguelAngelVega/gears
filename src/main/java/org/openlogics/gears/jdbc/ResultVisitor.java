@@ -1,5 +1,5 @@
 /*
- * gears
+ *     gears
  *     http://www.open-logics.com
  *     Copyright (C) 2012, OpenLogics
  *
@@ -19,9 +19,21 @@
 
 package org.openlogics.gears.jdbc;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 /**
  * @author Miguel Vega
- * @version $Id: ResultSetMapper.java 0, 2012-11-14 2:55 PM mvega $
+ * @version $Id: ResultVisitor.java 0, 2012-10-05 01:21 mvega $
  */
-public class ResultSetMapper {
+public interface ResultVisitor<T> {
+    /**
+     * This method executes a query and may return an object, this return
+     * parameter is then retrieved by the {@link DataStore#select} method.
+     *
+     * @param rs
+     * @return
+     * @throws SQLException
+     */
+    public T visit(ResultSet rs) throws SQLException;
 }

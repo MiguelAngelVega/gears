@@ -20,13 +20,12 @@
 package jdbc;
 
 import com.google.common.collect.Lists;
-import junit.framework.Assert;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.openlogics.gears.jdbc.DataStore;
 import org.openlogics.gears.jdbc.JdbcDataStore;
 import org.openlogics.gears.jdbc.Query;
-import org.openlogics.gears.jdbc.SimpleResultVisitor;
+import org.openlogics.gears.jdbc.ResultVisitor;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -51,7 +50,7 @@ public class QueryTest extends DefaultTest {
         logger.info("Result=" + result);
 
         try {
-            String response = ds.select(query, new SimpleResultVisitor<String>() {
+            String response = ds.select(query, new ResultVisitor<String>() {
                 @Override
                 public String visit(ResultSet rs) throws SQLException {
                     while(rs.next()){
@@ -73,7 +72,7 @@ public class QueryTest extends DefaultTest {
 
         Query<Integer> query = new Query<Integer>("select * from dis_students where STD_ID = #{id}", 2);
 
-        List<Object> result = ds.select(query, new SimpleResultVisitor<List<Object>>() {
+        List<Object> result = ds.select(query, new ResultVisitor<List<Object>>() {
             @Override
             public List<Object> visit(ResultSet rs) throws SQLException {
                 List<Object> result = Lists.newArrayList();
