@@ -44,7 +44,7 @@ public class QueryTest extends DefaultTest {
     public void objectResultVisitorTest(){
         DataStore ds = new JdbcDataStore(basicDataSource);
 
-        Query<String> query = new Query<String>("select STD_ID, " +
+        Query query = new Query("select STD_ID, " +
                 "STD_FNAME, " +
                 "STD_LNAME, " +
                 "STD_RATE as rate, " +
@@ -86,7 +86,7 @@ public class QueryTest extends DefaultTest {
     public void resultVisitorTest() {
         DataStore ds = new JdbcDataStore(basicDataSource);
 
-        Query<String> query = new Query<String>("select * from dis_students");
+        Query query = new Query("select * from dis_students");
         String result = query.toString();
         assertEquals("select * from dis_students", result);
         logger.info("Result=" + result);
@@ -112,7 +112,7 @@ public class QueryTest extends DefaultTest {
     public void testContextQuery() throws SQLException {
         DataStore ds = new JdbcDataStore(basicDataSource);
 
-        Query<Integer> query = new Query<Integer>("select * from dis_students where STD_ID = #{id}", 2);
+        Query query = new Query("select * from dis_students where STD_ID = #{id}", 2);
 
         List<Object> result = ds.select(query, new ResultVisitor<List<Object>>() {
             @Override

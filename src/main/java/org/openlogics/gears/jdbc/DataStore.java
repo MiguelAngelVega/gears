@@ -57,6 +57,43 @@ public abstract class DataStore {
         logger = Logger.getLogger(getClass());
     }
 
+
+
+    /**
+     * Executes a simple callable statement
+     * @param query
+     * @param <T>
+     */
+    public <T> void call(Query query){
+
+    }
+
+    /**
+     * Executes the given statement
+     * @param query
+     * @param context
+     * @param <T>
+     */
+    public <T> void update(Query query, T context){
+
+    }
+
+    /**
+     * Simple execution of the given statement
+     * @param query
+     */
+    public void update(Query query){
+
+    }
+
+    /**
+     *
+     * @param query
+     * @param visitor
+     * @param <T>
+     * @return
+     * @throws SQLException
+     */
     public <T> T select(Query query, ResultVisitor<? extends T> visitor) throws SQLException {
         //a simple list to hold data about query
         List params = Lists.newLinkedList();
@@ -156,6 +193,31 @@ public abstract class DataStore {
     }
 
     /**
+     * This method evaluates the given query string and replaces the parameters marked as '?'
+     * in the same order that the provided objects.
+     *
+     * @param query
+     * @param resultVisitor
+     * @param parameters
+     * @param <T>
+     * @return what visitor decides to return
+     */
+    public <T> T select(String query, final ResultVisitor<T> resultVisitor, Object... parameters) throws SQLException {
+
+        try {
+            QueryRunner runner = new QueryRunner();
+            return runner.query(connection, query.toString(), new ResultSetHandler<T>() {
+                @Override
+                public T handle(ResultSet rs) throws SQLException {
+                    return resultVisitor.visit(rs);
+                }
+            });
+        } finally {
+            closeConnection();
+        }
+    }
+
+    /**
      * Creates a new {@link PreparedStatement} object
      *
      * @param preparedSql
@@ -224,32 +286,6 @@ public abstract class DataStore {
     public void closeConnection() throws SQLException {
         DbUtils.close(connection);
         this.connection = null;
-    }
-
-    /**
-     * This method evaluates the given query string and replaces the parameters given as '?'
-     * in the same order that the provided objects.
-     *
-     * @param query
-     * @param resultVisitor
-     * @param parameters
-     * @param <T>
-     * @return what visitor decides to return
-     */
-    public <T> T select(String query, final ResultVisitor<T> resultVisitor, Object... parameters) throws SQLException {
-
-        try {
-            QueryRunner runner = new QueryRunner();
-            return runner.query(connection, query.toString(), new ResultSetHandler<T>() {
-                @Override
-                public T handle(ResultSet rs) throws SQLException {
-                    return resultVisitor.visit(rs);
-                }
-            });
-        } finally {
-            closeConnection();
-        }
-
     }
 
     public String getSchema() {

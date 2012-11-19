@@ -19,6 +19,8 @@
 
 package org.openlogics.gears.jdbc;
 
+import com.google.common.base.Strings;
+
 import java.util.List;
 
 /**
@@ -26,10 +28,9 @@ import java.util.List;
  * @author Miguel Vega
  * @version $Id: Query.java 0, 2012-10-05 4:03 PM mvega $
  */
-public class Query <U>{
+public class Query{
     private String queryString;
-    private U context;
-
+    private Object context;
     /**
      * Default constructor to build simple queries
      * @param queryString
@@ -43,7 +44,7 @@ public class Query <U>{
      * @param queryString a supported SQL statement. Can contains ?, #{}, or ${} keywords
      * @param context the object to retrieve data from
      */
-    public Query(String queryString, U context){
+    public Query(String queryString, Object context){
         this.queryString = queryString;
         this.context = context;
     }
@@ -62,13 +63,13 @@ public class Query <U>{
      * @param data
      * @return
      */
-    public String evaluateQueryString(DataStore dataStore, final List data) {
-        if (queryString == null) {
+    protected String evaluateQueryString(DataStore dataStore, final List data) {
+        if (Strings.isNullOrEmpty(queryString)) {
             throw new IllegalArgumentException("SQL Statement found is NULL");
         }
         //Before threat all the complexQuery replace the ${ds_schema}
-        if (dataStore.getSchema() != null) {
-            queryString = queryString.replace("${ds_schema}", dataStore.getSchema());
+        if (!Strings.isNullOrEmpty(dataStore.getSchema())) {
+            queryString = queryString.replace("${schema}", dataStore.getSchema());
         }
         if (context == null) {
             return queryString;
@@ -88,6 +89,4 @@ public class Query <U>{
         });
         return queryString;
     }
-
-
 }

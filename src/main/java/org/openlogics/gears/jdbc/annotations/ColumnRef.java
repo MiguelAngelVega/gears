@@ -23,12 +23,12 @@ import java.lang.annotation.*;
 
 /**
  * @author Miguel Vega
- * @version $Id: Column.java 0, 2012-11-15 5:14 PM mvega $
+ * @version $Id: ColumnRef.java 0, 2012-11-15 5:14 PM mvega $
  */
 @Documented
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Column {
+public @interface ColumnRef {
     /**
      * the attribute name for an element's attribute object
      * @return

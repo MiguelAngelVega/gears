@@ -22,7 +22,7 @@ package bean;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.openlogics.gears.jdbc.annotations.Column;
+import org.openlogics.gears.jdbc.annotations.ColumnRef;
 
 /**
  * @author Miguel Vega
@@ -31,12 +31,12 @@ import org.openlogics.gears.jdbc.annotations.Column;
 @ToString
 public class Person {
     @Getter @Setter
-    @Column("STD_FNAME")
+    @ColumnRef("STD_FNAME")
     protected String fname;
     @Getter @Setter
-    @Column("STD_LNAME")
+    @ColumnRef("STD_LNAME")
     protected String lname;
     @Getter @Setter
-    @Column("STD_ID")
+    @ColumnRef("STD_ID")
     protected long id;
 }

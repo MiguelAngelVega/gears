@@ -24,7 +24,7 @@ import com.google.common.collect.Lists;
 import org.apache.log4j.Logger;
 import org.openlogics.gears.jdbc.ObjectResultVisitor;
 import org.openlogics.gears.jdbc.ResultVisitor;
-import org.openlogics.gears.jdbc.annotations.Column;
+import org.openlogics.gears.jdbc.annotations.ColumnRef;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -134,7 +134,7 @@ public class BeanResultHandler<T> implements ResultVisitor{
                     }
                     Object value = null;
                     try {
-                        Column c = field.getAnnotation(Column.class);
+                        ColumnRef c = field.getAnnotation(ColumnRef.class);
                         if (c != null) {
                             columnName = c.value().trim();
                         }
