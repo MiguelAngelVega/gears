@@ -21,6 +21,7 @@ package bean;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.openlogics.gears.jdbc.annotations.Column;
 
 /**
  * @author Miguel Vega
@@ -28,9 +29,12 @@ import lombok.Setter;
  */
 public class Person {
     @Getter @Setter
+    @Column("STD_FNAME")
     protected String fname;
     @Getter @Setter
+    @Column("STD_LNAME")
     protected String lname;
     @Getter @Setter
-    protected String id;
+    @Column("STD_ID")
+    protected long id;
 }

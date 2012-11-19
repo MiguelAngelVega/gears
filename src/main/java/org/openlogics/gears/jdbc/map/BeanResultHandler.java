@@ -19,6 +19,7 @@
 
 package org.openlogics.gears.jdbc.map;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.apache.log4j.Logger;
 import org.openlogics.gears.jdbc.ObjectResultVisitor;
@@ -50,6 +51,9 @@ public class BeanResultHandler<T> implements ResultVisitor{
         this.requiredType = requiredType;
     }
 
+    public static final BeanResultHandler buildMapListHandler(ObjectResultVisitor<Map<String, Object>> visitor){
+        return new BeanResultHandler(visitor, Map.class);
+    }
 
     @Override
     public Object visit(ResultSet rs) throws SQLException {
@@ -109,10 +113,10 @@ public class BeanResultHandler<T> implements ResultVisitor{
             if (instantiate == null || instantiate.getType() == null) {
                 throw new IllegalArgumentException("Initializer can not be null neither the type to instantiate.");
             }
-            T obj = instantiate.newInstance(resultSet);
             ResultSetMetaData rsmd = resultSet.getMetaData();
             Class requiredType = instantiate.getType();
             if (!Map.class.isAssignableFrom(requiredType)) {
+                T obj = instantiate.newInstance(resultSet);
                 //Adecuate RESULTS to BEAN struct
                 List<Field> fields = getInheritedFields(requiredType);//requiredType.getDeclaredFields();
                 for (Field field : fields) {
@@ -139,11 +143,11 @@ public class BeanResultHandler<T> implements ResultVisitor{
                         value = resultSet.getObject(columnName);
                         method.invoke(obj, value);
                     } catch (IllegalArgumentException ex) {
-                        logger.debug("Attempting to force the attribute recovery.");
+                        logger.debug("Type found in database is '"+value.getClass().getName()+"', but target object requires '"+field.getType().getName()+"': "+ex.getLocalizedMessage());
                         //if this is thrown the try to fix this error using the following:
                         //If is a big decimal, maybe bean has double or float attributes
                         try {
-                            if (value instanceof BigDecimal) {
+                            if (value instanceof BigDecimal || value instanceof Number) {
                                 if (Double.class.isAssignableFrom(field.getType())
                                         || double.class.isAssignableFrom(field.getType())) {
                                     method.invoke(obj, ((BigDecimal) value).doubleValue());
@@ -183,33 +187,21 @@ public class BeanResultHandler<T> implements ResultVisitor{
                         //throw new DataSourceException("Can't inject an object into method " + method.getName(), ex);
                         logger.warn("Can't inject an object into method " + method.getName() + " due to: " + ex.getMessage());
                     } catch (SQLException ex) {
-                        try {
-                            //instead of use the @Column, let's simply try to get the fieldname to retrieve it
-                            columnName = field.getName();
-                            value = resultSet.getObject(columnName);
-                            try {
-                                method.invoke(obj, value);
-                            } catch (IllegalArgumentException ex1) {
-                                printIllegalArgumentException(ex1, field, value);
-                            } catch (InvocationTargetException ex1) {
-                            }
-                        } catch (SQLException x) {
-                            logger.warn("The column name '" + columnName + "' was not found in query results, "
-                                    + "this may cause that some attributes in result bean are NULL."
-                                    + System.getProperty("line.separator")
-                                    + "SQLException catched when trying to take a resultset entry to bean setter:" + requiredType.getName() + "." + metName, x);
-                        }
+                        logger.warn("Target object has a field '" + columnName + "', this was not found in query results, "
+                                + "this cause that attribute remains NULL or with default value.");
                     }
                 }
+                return obj;
             } else {
+                ImmutableMap.Builder<String, Object> obj = new ImmutableMap.Builder<String, Object>();
                 //Adecuate results to BEAN
                 for (int i = 1; i <= rsmd.getColumnCount(); i++) {
                     String column = useColumnLabel ? rsmd.getColumnLabel(i) : rsmd.getColumnName(i);
                     Object value = resultSet.getObject(i);
-                    ((Map) obj).put(column, value);
+                    obj.put(column, value);
                 }
+                return (T) obj.build();
             }
-            return obj;
         } catch (IllegalAccessException ex) {
             throw new SQLException("Object of class " + instantiate.getType().getName() + " doesn't provide a valid access. It's possible be private or protected access only.", ex);
         }

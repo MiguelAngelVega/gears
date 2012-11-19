@@ -19,7 +19,9 @@
 
 package org.openlogics.gears.jdbc.map;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.log4j.Logger;
 
 import java.lang.reflect.Constructor;
@@ -27,6 +29,7 @@ import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class allows to instantiate a new object using reflection, based on the parameters provided.

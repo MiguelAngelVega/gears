@@ -19,6 +19,8 @@
 
 package org.openlogics.gears.jdbc;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.QueryRunner;
@@ -31,6 +33,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Miguel Vega
@@ -90,34 +93,66 @@ public abstract class DataStore {
 
     /**
      * @param query
+     * @param resultType
      * @param visitor
      */
-    public <T> void select(Query query, ObjectResultVisitor<? extends T> visitor) throws SQLException {
+    public <T> void select(Query query, Class<?> resultType, ObjectResultVisitor<? extends T> visitor) throws SQLException {
         List params = Lists.newLinkedList();
-        BeanResultHandler toBeanResultHandler = new BeanResultHandler();
+        BeanResultHandler toBeanResultHandler = new BeanResultHandler(visitor, resultType);
         String queryString = query.evaluateQueryString(this, params);
         PreparedStatement ps = prepareStatement(queryString.toString(), params);
 
         try {
-            select(ps, new ResultVisitor() {
-                @Override
-                public Object visit(ResultSet rs) throws SQLException {
-                    while (rs.next()) {
-                        T obj = resultMapper.mapResultSet(rs, requiredType);
-                        handler.visit(obj, conn, rs);
-                    }
-                    return null;
-                }
-            });
-        } catch (SQLException x) {
-            throw new SQLException("An error occurred while attempting to make a query.", x);
+            select(ps, toBeanResultHandler);
         } finally {
             params.clear();
         }
     }
 
-    public <T> T select() {
-        return null;
+    public <T> List<T> select(Query query, Class<T> type) throws SQLException {
+        List params = Lists.newLinkedList();
+        final ImmutableList.Builder<T> builder = new ImmutableList.Builder<T>();
+        ObjectResultVisitor<T> handler = new ObjectResultVisitor<T>() {
+            @Override
+            public void visit(T result) throws SQLException {
+                builder.add(result);
+            }
+        };
+        BeanResultHandler<T> toBeanResultHandler = new BeanResultHandler<T>(handler, type);
+        String queryString = query.evaluateQueryString(this, params);
+        PreparedStatement ps = prepareStatement(queryString.toString(), params);
+        try {
+            select(ps, toBeanResultHandler);
+        } finally {
+            params.clear();
+        }
+        return builder.build();
+    }
+
+    /**
+     *
+     * @param query
+     * @return
+     * @throws SQLException
+     */
+    public List<Map<String, Object>> select(Query query) throws SQLException {
+        final ImmutableList.Builder<Map<String, Object>> builder = new ImmutableList.Builder<Map<String, Object>>();
+        ObjectResultVisitor<Map<String, Object>> handler = new ObjectResultVisitor<Map<String, Object>>() {
+            @Override
+            public void visit(Map<String, Object> result) throws SQLException {
+                builder.add(result);
+            }
+        };
+        BeanResultHandler toBeanResultHandler = new BeanResultHandler(handler, Map.class);
+        List params = Lists.newLinkedList();
+        String queryString = query.evaluateQueryString(this, params);
+        PreparedStatement ps = prepareStatement(queryString.toString(), params);
+        try {
+            select(ps, toBeanResultHandler);
+        } finally {
+            params.clear();
+        }
+        return builder.build();
     }
 
     /**

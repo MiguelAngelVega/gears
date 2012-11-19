@@ -20,6 +20,7 @@
 package bean;
 
 import lombok.Data;
+import org.openlogics.gears.jdbc.annotations.Column;
 
 import java.sql.Timestamp;
 
@@ -30,5 +31,6 @@ import java.sql.Timestamp;
 @Data
 public class Student extends Person{
     private float rate;
+    @Column("std_add_date")
     private Timestamp addDate;
 }

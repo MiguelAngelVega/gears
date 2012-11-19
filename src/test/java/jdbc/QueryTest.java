@@ -19,17 +19,16 @@
 
 package jdbc;
 
+import bean.Student;
 import com.google.common.collect.Lists;
 import org.apache.log4j.Logger;
 import org.junit.Test;
-import org.openlogics.gears.jdbc.DataStore;
-import org.openlogics.gears.jdbc.JdbcDataStore;
-import org.openlogics.gears.jdbc.Query;
-import org.openlogics.gears.jdbc.ResultVisitor;
+import org.openlogics.gears.jdbc.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
@@ -40,8 +39,51 @@ import static junit.framework.Assert.assertTrue;
  */
 public class QueryTest extends DefaultTest {
     Logger logger = Logger.getLogger(QueryTest.class);
+
     @Test
-    public void simpleQueryTest() {
+    public void objectResultVisitorTest(){
+        DataStore ds = new JdbcDataStore(basicDataSource);
+
+        Query<String> query = new Query<String>("select STD_ID, " +
+                "STD_FNAME, " +
+                "STD_LNAME, " +
+                "STD_RATE as rate, " +
+                "STD_ADD_DATE from dis_students");
+        try {
+            ds.select(query, Student.class, new ObjectResultVisitor<Student>() {
+                @Override
+                public void visit(Student result) throws SQLException {
+                    logger.info(">>>>>>>>>id="+result.getId()+", rate="+result.getRate()+", addDate="+result.getAddDate());
+                }
+            });
+        } catch (SQLException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        //
+        try {
+            List<Map<String, Object>> results = ds.select(query);
+            for (Map<String, Object> res:results){
+                System.out.println("*****************************"+res+", rate="+res.get("STD_ID").getClass());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        //
+        try {
+            List<Student> stds = ds.select(query, Student.class);
+            for (Student std:stds){
+                System.out.println("--------------------------"+std);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+    }
+
+    @Test
+    public void resultVisitorTest() {
         DataStore ds = new JdbcDataStore(basicDataSource);
 
         Query<String> query = new Query<String>("select * from dis_students");

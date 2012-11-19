@@ -30,7 +30,7 @@ import java.sql.SQLException;
 public interface ObjectResultVisitor<S> {
     /**
      * This method will return the object created from query results.
-     * @param result an object as result from query
+     * @param obj an object as result from query
      */
-    public void visit(S result)throws SQLException;
+    public void visit(S obj)throws SQLException;
 }
