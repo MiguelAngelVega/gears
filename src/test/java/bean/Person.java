@@ -21,12 +21,14 @@ package bean;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.openlogics.gears.jdbc.annotations.Column;
 
 /**
  * @author Miguel Vega
  * @version $Id: Person.java 0, 2012-09-29 12:00 mvega $
  */
+@ToString
 public class Person {
     @Getter @Setter
     @Column("STD_FNAME")
