@@ -21,6 +21,7 @@ package jdbc;
 
 import bean.Student;
 import com.google.common.collect.Lists;
+import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.openlogics.gears.jdbc.*;
@@ -50,9 +51,9 @@ public class QueryTest extends DefaultTest {
                 "STD_RATE as rate, " +
                 "STD_ADD_DATE from dis_students");
         try {
-            ds.select(query, Student.class, new ObjectResultVisitor<Student>() {
+            ds.select(query, Student.class, new ObjectResultSetHandler<Student>() {
                 @Override
-                public void visit(Student result) throws SQLException {
+                public void handle(Student result) throws SQLException {
                     logger.info(">>>>>>>>>id="+result.getId()+", rate="+result.getRate()+", addDate="+result.getAddDate());
                 }
             });
@@ -92,9 +93,9 @@ public class QueryTest extends DefaultTest {
         logger.info("Result=" + result);
 
         try {
-            String response = ds.select(query, new ResultVisitor<String>() {
+            String response = ds.select(query, new ResultSetHandler<String>(){
                 @Override
-                public String visit(ResultSet rs) throws SQLException {
+                public String handle(ResultSet rs) throws SQLException {
                     while(rs.next()){
                         logger.debug("Record found..." + rs.getInt(1));
                     }
@@ -114,9 +115,9 @@ public class QueryTest extends DefaultTest {
 
         Query query = new Query("select * from dis_students where STD_ID = #{id}", 2);
 
-        List<Object> result = ds.select(query, new ResultVisitor<List<Object>>() {
+        List<Object> result = ds.select(query, new ResultSetHandler<List<Object>>() {
             @Override
-            public List<Object> visit(ResultSet rs) throws SQLException {
+            public List<Object> handle(ResultSet rs) throws SQLException {
                 List<Object> result = Lists.newArrayList();
                 if(rs.next()){
                     result.add(rs.getObject(1));

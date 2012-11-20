@@ -21,9 +21,9 @@ package org.openlogics.gears.jdbc.map;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.log4j.Logger;
-import org.openlogics.gears.jdbc.ObjectResultVisitor;
-import org.openlogics.gears.jdbc.ResultVisitor;
+import org.openlogics.gears.jdbc.ObjectResultSetHandler;
 import org.openlogics.gears.jdbc.annotations.ColumnRef;
 
 import java.lang.reflect.Field;
@@ -39,27 +39,27 @@ import java.util.Map;
  * @author Miguel Vega
  * @version $Id: BeanResultHandler.java 0, 2012-11-14 2:55 PM mvega $
  */
-public class BeanResultHandler<T> implements ResultVisitor{
+public class BeanResultHandler<T> implements ResultSetHandler{
 
     Logger logger = Logger.getLogger(BeanResultHandler.class);
 
-    private ObjectResultVisitor<T> visitor;
+    private ObjectResultSetHandler<T> setHandler;
     private Class<T> requiredType;
 
-    public BeanResultHandler(ObjectResultVisitor<T> visitor, Class<T> requiredType){
-        this.visitor = visitor;
+    public BeanResultHandler(ObjectResultSetHandler<T> setHandler, Class<T> requiredType){
+        this.setHandler = setHandler;
         this.requiredType = requiredType;
     }
 
-    public static final BeanResultHandler buildMapListHandler(ObjectResultVisitor<Map<String, Object>> visitor){
-        return new BeanResultHandler(visitor, Map.class);
+    public static final BeanResultHandler buildMapListHandler(ObjectResultSetHandler<Map<String, Object>> setHandler){
+        return new BeanResultHandler(setHandler, Map.class);
     }
 
     @Override
-    public Object visit(ResultSet rs) throws SQLException {
+    public Object handle(ResultSet rs) throws SQLException {
         while (rs.next()) {
             T obj = mapResultSet(rs, requiredType);
-            visitor.visit(obj);
+            setHandler.handle(obj);
         }
         return null;
     }

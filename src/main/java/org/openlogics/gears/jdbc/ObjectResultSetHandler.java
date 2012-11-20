@@ -25,12 +25,12 @@ import java.sql.SQLException;
 /**
  * This interface allows to receive transformed beans as result from a query
  * @author Miguel Vega
- * @version $Id: ObjectResultVisitor.java 0, 2012-10-05 01:15 mvega $
+ * @version $Id: ObjectResultSetHandler.java 0, 2012-10-05 01:15 mvega $
  */
-public interface ObjectResultVisitor<S> {
+public interface ObjectResultSetHandler<S> {
     /**
      * This method will return the object created from query results.
      * @param obj an object as result from query
      */
-    public void visit(S obj)throws SQLException;
+    public void handle(S obj)throws SQLException;
 }

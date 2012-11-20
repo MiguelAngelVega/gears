@@ -20,7 +20,6 @@
 package org.openlogics.gears.jdbc;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.QueryRunner;
@@ -32,8 +31,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 /**
  * @author Miguel Vega
@@ -57,74 +58,51 @@ public abstract class DataStore {
         logger = Logger.getLogger(getClass());
     }
 
-
-
     /**
      * Executes a simple callable statement
+     *
      * @param query
      * @param <T>
      */
-    public <T> void call(Query query){
+    public <T> void call(Query query) {
 
     }
 
     /**
      * Executes the given statement
+     *
      * @param query
      * @param context
      * @param <T>
      */
-    public <T> void update(Query query, T context){
+    public <T> void update(Query query, T context) {
 
     }
 
     /**
      * Simple execution of the given statement
-     * @param query
-     */
-    public void update(Query query){
-
-    }
-
-    /**
      *
      * @param query
-     * @param visitor
-     * @param <T>
-     * @return
-     * @throws SQLException
      */
-    public <T> T select(Query query, ResultVisitor<? extends T> visitor) throws SQLException {
-        //a simple list to hold data about query
-        List params = Lists.newLinkedList();
-        try {
-            String queryString = query.evaluateQueryString(this, params);
-            PreparedStatement ps = prepareStatement(queryString.toString(), params);
-            return this.select(ps, visitor);
-        } finally {
-            params.clear();
-        }
+    public void update(Query query) {
+
     }
 
     /**
-     * @param preparedSt
+     * @param query
      * @param handler
      * @param <T>
      * @return
      * @throws SQLException
      */
-    public <T> T select(PreparedStatement preparedSt, ResultVisitor<? extends T> handler) throws SQLException {
-        logger.debug("Attempting to execute a preparedStatement QUERY: " + preparedSt + ", mapped to ");
-        ResultSet rs = null;
+    public <T> T select(Query query, ResultSetHandler<? extends T> handler) throws SQLException {
+        //a simple list to hold data about query
+        List params = Lists.newLinkedList();
         try {
-            rs = preparedSt.executeQuery();
-            return handler.visit(rs);
+            String queryString = query.evaluateQueryString(this, params);
+            return queryRunner(queryString, handler, params);
         } finally {
-            if (rs != null) rs.close();
-            DbUtils.close(preparedSt);
-            if (isAutoClose()) {
-                closeConnection();
-            }
+            params.clear();
         }
     }
 
@@ -133,14 +111,12 @@ public abstract class DataStore {
      * @param resultType
      * @param visitor
      */
-    public <T> void select(Query query, Class<?> resultType, ObjectResultVisitor<? extends T> visitor) throws SQLException {
+    public <T> void select(Query query, Class<?> resultType, ObjectResultSetHandler<? extends T> visitor) throws SQLException {
         List params = Lists.newLinkedList();
         BeanResultHandler toBeanResultHandler = new BeanResultHandler(visitor, resultType);
         String queryString = query.evaluateQueryString(this, params);
-        PreparedStatement ps = prepareStatement(queryString.toString(), params);
-
         try {
-            select(ps, toBeanResultHandler);
+            queryRunner(queryString, toBeanResultHandler, params);
         } finally {
             params.clear();
         }
@@ -149,17 +125,16 @@ public abstract class DataStore {
     public <T> List<T> select(Query query, Class<T> type) throws SQLException {
         List params = Lists.newLinkedList();
         final ImmutableList.Builder<T> builder = new ImmutableList.Builder<T>();
-        ObjectResultVisitor<T> handler = new ObjectResultVisitor<T>() {
+        ObjectResultSetHandler<T> handler = new ObjectResultSetHandler<T>() {
             @Override
-            public void visit(T result) throws SQLException {
+            public void handle(T result) throws SQLException {
                 builder.add(result);
             }
         };
         BeanResultHandler<T> toBeanResultHandler = new BeanResultHandler<T>(handler, type);
         String queryString = query.evaluateQueryString(this, params);
-        PreparedStatement ps = prepareStatement(queryString.toString(), params);
         try {
-            select(ps, toBeanResultHandler);
+            queryRunner(queryString, toBeanResultHandler, params);
         } finally {
             params.clear();
         }
@@ -167,27 +142,27 @@ public abstract class DataStore {
     }
 
     /**
-     *
      * @param query
      * @return
      * @throws SQLException
      */
     public List<Map<String, Object>> select(Query query) throws SQLException {
         final ImmutableList.Builder<Map<String, Object>> builder = new ImmutableList.Builder<Map<String, Object>>();
-        ObjectResultVisitor<Map<String, Object>> handler = new ObjectResultVisitor<Map<String, Object>>() {
+        ObjectResultSetHandler<Map<String, Object>> handler = new ObjectResultSetHandler<Map<String, Object>>() {
             @Override
-            public void visit(Map<String, Object> result) throws SQLException {
+            public void handle(Map<String, Object> result) throws SQLException {
                 builder.add(result);
             }
         };
         BeanResultHandler toBeanResultHandler = new BeanResultHandler(handler, Map.class);
         List params = Lists.newLinkedList();
         String queryString = query.evaluateQueryString(this, params);
-        PreparedStatement ps = prepareStatement(queryString.toString(), params);
+
         try {
-            select(ps, toBeanResultHandler);
+            queryRunner(queryString, toBeanResultHandler, params);
         } finally {
             params.clear();
+            params = null;
         }
         return builder.build();
     }
@@ -202,19 +177,23 @@ public abstract class DataStore {
      * @param <T>
      * @return what visitor decides to return
      */
-    public <T> T select(String query, final ResultVisitor<T> resultVisitor, Object... parameters) throws SQLException {
+    public <T> T select(String query, final ResultSetHandler<T> resultVisitor, Object... parameters) throws SQLException {
 
         try {
-            QueryRunner runner = new QueryRunner();
-            return runner.query(connection, query.toString(), new ResultSetHandler<T>() {
+            return queryRunner(query, new ResultSetHandler<T>() {
                 @Override
                 public T handle(ResultSet rs) throws SQLException {
-                    return resultVisitor.visit(rs);
+                    return resultVisitor.handle(rs);
                 }
-            });
+            }, Lists.newLinkedList());
         } finally {
             closeConnection();
         }
+    }
+
+    private <E> E queryRunner(String query, ResultSetHandler<E> handler, List data)throws SQLException{
+        QueryRunner qr = new QueryRunner();
+        return qr.query(getConnection(), query, handler, data.toArray());
     }
 
     /**
@@ -224,8 +203,10 @@ public abstract class DataStore {
      * @param params
      * @return
      * @throws SQLException
+     * @deprecated used in the older version of the CoreJavaBeans
      */
-    public PreparedStatement prepareStatement(String preparedSql, List params) throws SQLException {
+    @Deprecated
+    private PreparedStatement prepareStatement(String preparedSql, List params) throws SQLException {
         Connection conn = acquireConnection();
         PreparedStatement preparedSt = conn.prepareStatement(preparedSql);
         for (int i = 0; i < params.size(); i++) {
@@ -233,6 +214,30 @@ public abstract class DataStore {
             preparedSt.setObject(i + 1, object);
         }
         return preparedSt;
+    }
+
+    /**
+     * @param preparedSt
+     * @param handler
+     * @param <T>
+     * @return
+     * @throws SQLException
+     * @deprecated Used in an older version of teh CoreJavaBeans, but maybe useful yet, unitil find more features
+     */
+    @Deprecated
+    public <T> T select(PreparedStatement preparedSt, ResultSetHandler<? extends T> handler) throws SQLException {
+        logger.debug("Attempting to execute a preparedStatement QUERY: " + preparedSt + ", mapped to ");
+        ResultSet rs = null;
+        try {
+            rs = preparedSt.executeQuery();
+            return handler.handle(rs);
+        } finally {
+            if (rs != null) rs.close();
+            DbUtils.close(preparedSt);
+            if (isAutoClose()) {
+                closeConnection();
+            }
+        }
     }
 
     public synchronized void setAutoClose(boolean autoClose) {
@@ -276,6 +281,17 @@ public abstract class DataStore {
     public void rollBack() throws SQLException {
         if (connection != null)
             connection.rollback();
+    }
+
+    /**
+     * This method was created for executing many transactions using a common connection, avoiding unnecessary connection openings.
+     * DO NOT forget to close the connection when all processes ended.
+     * @return database connection
+     */
+    public Connection getConnection() throws SQLException {
+        this.connection = (connection != null && !connection.isClosed()) ? connection : acquireConnection();
+        connection.setAutoCommit(autoCommit);
+        return connection;
     }
 
     /**
