@@ -31,10 +31,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 /**
  * @author Miguel Vega
@@ -72,20 +70,15 @@ public abstract class DataStore {
      * Executes the given statement
      *
      * @param query
-     * @param context
-     * @param <T>
      */
-    public <T> void update(Query query, T context) {
-
-    }
-
-    /**
-     * Simple execution of the given statement
-     *
-     * @param query
-     */
-    public void update(Query query) {
-
+    public void update(Query query) throws SQLException {
+        List p = Lists.newLinkedList();
+        String queryString = query.evaluateQueryString(this, p);
+        try {
+            update(queryString, p);
+        } finally {
+            p.clear();
+        }
     }
 
     /**
@@ -100,7 +93,7 @@ public abstract class DataStore {
         List params = Lists.newLinkedList();
         try {
             String queryString = query.evaluateQueryString(this, params);
-            return queryRunner(queryString, handler, params);
+            return query(queryString, handler, params);
         } finally {
             params.clear();
         }
@@ -116,7 +109,7 @@ public abstract class DataStore {
         BeanResultHandler toBeanResultHandler = new BeanResultHandler(visitor, resultType);
         String queryString = query.evaluateQueryString(this, params);
         try {
-            queryRunner(queryString, toBeanResultHandler, params);
+            query(queryString, toBeanResultHandler, params);
         } finally {
             params.clear();
         }
@@ -134,7 +127,7 @@ public abstract class DataStore {
         BeanResultHandler<T> toBeanResultHandler = new BeanResultHandler<T>(handler, type);
         String queryString = query.evaluateQueryString(this, params);
         try {
-            queryRunner(queryString, toBeanResultHandler, params);
+            query(queryString, toBeanResultHandler, params);
         } finally {
             params.clear();
         }
@@ -159,7 +152,7 @@ public abstract class DataStore {
         String queryString = query.evaluateQueryString(this, params);
 
         try {
-            queryRunner(queryString, toBeanResultHandler, params);
+            query(queryString, toBeanResultHandler, params);
         } finally {
             params.clear();
             params = null;
@@ -180,7 +173,7 @@ public abstract class DataStore {
     public <T> T select(String query, final ResultSetHandler<T> resultVisitor, Object... parameters) throws SQLException {
 
         try {
-            return queryRunner(query, new ResultSetHandler<T>() {
+            return query(query, new ResultSetHandler<T>() {
                 @Override
                 public T handle(ResultSet rs) throws SQLException {
                     return resultVisitor.handle(rs);
@@ -191,9 +184,14 @@ public abstract class DataStore {
         }
     }
 
-    private <E> E queryRunner(String query, ResultSetHandler<E> handler, List data)throws SQLException{
+    private <E> E query(String query, ResultSetHandler<E> handler, List data) throws SQLException {
         QueryRunner qr = new QueryRunner();
         return qr.query(getConnection(), query, handler, data.toArray());
+    }
+
+    private int update(String query, List data) throws SQLException {
+        QueryRunner qr = new QueryRunner();
+        return qr.update(getConnection(), query, data.toArray());
     }
 
     /**
@@ -267,7 +265,7 @@ public abstract class DataStore {
     /**
      * @throws SQLException
      */
-    protected void commit() throws SQLException {
+    public void commit() throws SQLException {
         if (connection != null) {
             connection.commit();
         }
@@ -286,6 +284,7 @@ public abstract class DataStore {
     /**
      * This method was created for executing many transactions using a common connection, avoiding unnecessary connection openings.
      * DO NOT forget to close the connection when all processes ended.
+     *
      * @return database connection
      */
     public Connection getConnection() throws SQLException {
