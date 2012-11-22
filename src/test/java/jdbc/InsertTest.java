@@ -9,6 +9,7 @@ import org.openlogics.gears.jdbc.JdbcDataStore;
 import org.openlogics.gears.jdbc.Query;
 import pojo.Student;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
@@ -81,6 +82,13 @@ public class InsertTest extends TestStub {
     @Test
     public void batchInsert() throws SQLException {
         DataStore ds = new JdbcDataStore(basicDataSource);
+        ds.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
+
+        Student std = new Student();
+        std.setFname("Mr.");
+        std.setLname("Bean");
+        std.setRate(100);
+        std.setAddDate(new Timestamp(currentTimeMillis()));
 
         BatchQuery<Map<String, Object>> query = new BatchQuery<Map<String, Object>>("insert into dis_students (STD_FNAME, STD_LNAME, STD_RATE, STD_ADD_DATE)" +
                 " values " +
@@ -90,10 +98,11 @@ public class InsertTest extends TestStub {
         addBatch(ImmutableMap.<String, Object>of("fname", "User 3", "lname", "Last 3", "rate", 63f, "addDate", new Timestamp(currentTimeMillis()))).
         addBatch(ImmutableMap.<String, Object>of("fname", "User 4", "lname", "Last 4", "rate", 64f, "addDate", new Timestamp(currentTimeMillis()))).
         addBatch(ImmutableMap.<String, Object>of("fname", "User 5", "lname", "Last 5", "rate", 65f, "addDate", new Timestamp(currentTimeMillis()))).
-        addBatch(ImmutableMap.<String, Object>of("fname", "User 6", "lname", "Last 6", "rate", 66f, "addDate", new Timestamp(currentTimeMillis())));
+        addBatch(ImmutableMap.<String, Object>of("fname", "User 6", "lname", "Last 6", "rate", 66f, "addDate", new Timestamp(currentTimeMillis()))).
+        addBatch(std);
 
         int[] update = ds.update(query);
-        assertEquals(6, update.length);
+        assertEquals(7, update.length);
 
         logger.info("Showing update batch results");
         viewAll(ds);

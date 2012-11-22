@@ -21,16 +21,14 @@ package org.openlogics.gears.jdbc;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import org.apache.commons.dbutils.AsyncQueryRunner;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.log4j.Logger;
 import org.openlogics.gears.jdbc.map.BeanResultHandler;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +44,7 @@ public abstract class DataStore {
      * transactionIsolation, allows to define the isolation level for the transaction,
      * useful when need to lock rows from database.
      */
-    private int transactionIsolation;
+    private int transactionIsolation = -1;
 
     protected Logger logger;
 
@@ -287,9 +285,16 @@ public abstract class DataStore {
         this.autoClose = autoClose;
     }
 
+    /**
+     * This automatically disables the auto-commit and auto-closeable features of the connection.
+     * <code>Warning!, Be sure to close the connection when finishing.</code>
+     * @param autoCommit TRUE if commit per transaction is allowed
+     */
     public synchronized void setAutoCommit(boolean autoCommit) {
-        logger.warn("Attempting to modify the connection AUTO COMMIT type to: " + autoCommit);
+        logger.warn("Attempting to modify the connection AUTO COMMIT type to: " + autoCommit+". This causes that auto close is disabled.");
         this.autoCommit = autoCommit;
+        //if autocommit is false, is necessary that connection auto close becomes false
+        this.autoClose = !autoCommit?false:autoClose;
     }
 
     /**
@@ -334,6 +339,12 @@ public abstract class DataStore {
     public Connection getConnection() throws SQLException {
         this.connection = (connection != null && !connection.isClosed()) ? connection : acquireConnection();
         connection.setAutoCommit(autoCommit);
+        if(transactionIsolation!=-1){
+            connection.setTransactionIsolation(transactionIsolation);
+            DatabaseMetaData dbmd = connection.getMetaData();
+            logger.info("Attempting to use a TRANSACTION ISOLATION, '" + transactionIsolation + "', connection "+
+                    (dbmd.supportsTransactionIsolationLevel(transactionIsolation)?"does NOT ":" does ")+ "support Isolation Level.");
+        }
         return connection;
     }
 
@@ -345,6 +356,12 @@ public abstract class DataStore {
     public void closeConnection() throws SQLException {
         DbUtils.close(connection);
         this.connection = null;
+    }
+
+    private void finish() throws SQLException {
+        if(autoClose){
+            closeConnection();
+        }
     }
 
     public String getSchema() {
@@ -369,5 +386,9 @@ public abstract class DataStore {
 
     public void setTransactionIsolation(int transactionIsolation) {
         this.transactionIsolation = transactionIsolation;
+    }
+
+    public void setTransactionIsolationNone() {
+        this.transactionIsolation = -1;
     }
 }
