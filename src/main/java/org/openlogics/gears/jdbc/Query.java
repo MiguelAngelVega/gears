@@ -21,6 +21,7 @@ package org.openlogics.gears.jdbc;
 
 import com.google.common.base.Strings;
 
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -30,7 +31,7 @@ import java.util.List;
  */
 public class Query{
     private String queryString;
-    private Object context;
+    protected Object context;
     /**
      * Default constructor to build simple queries
      * @param queryString
@@ -67,26 +68,27 @@ public class Query{
         if (Strings.isNullOrEmpty(queryString)) {
             throw new IllegalArgumentException("SQL Statement found is NULL");
         }
+        String localQueryString = queryString;
         //Before threat all the complexQuery replace the ${ds_schema}
         if (!Strings.isNullOrEmpty(dataStore.getSchema())) {
-            queryString = queryString.replace("${schema}", dataStore.getSchema());
+            localQueryString = localQueryString.replace("${schema}", dataStore.getSchema());
         }
         if (context == null) {
-            return queryString;
+            return localQueryString;
         }
 
         SQLExpressionTransformer el = SQLExpressionTransformer.buildStaticTransformer();
         //simple access
-        queryString = el.transform(queryString, context);
+        localQueryString = el.transform(localQueryString, context);
         //System.out.println("Evaluated........1....."+complexQuery);
         el = SQLExpressionTransformer.buildDynamicTransformer();
         //when got an input-required, visitor visits with the item found
-        queryString = el.evaluateFixedParameter(queryString, context, "?", new SQLExpressionTransformer.ParameterParsedHandler() {
+        localQueryString = el.evaluateFixedParameter(localQueryString, context, "?", new SQLExpressionTransformer.ParameterParsedHandler() {
             @Override
             public void handle(Object obj) {
                 data.add(obj);
             }
         });
-        return queryString;
+        return localQueryString;
     }
 }

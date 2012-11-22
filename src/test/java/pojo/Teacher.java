@@ -1,5 +1,5 @@
 /*
- *     gears
+ *     JavaTools
  *     http://www.open-logics.com
  *     Copyright (C) 2012, OpenLogics
  *
@@ -17,22 +17,18 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package bean;
+package pojo;
 
 import lombok.Data;
 
-import java.util.List;
-
 /**
  * @author Miguel Vega
- * @version $Id: ClassRoom.java 0, 2012-09-29 12:04 mvega $
+ * @version $Id: Teacher.java 0, 2012-09-29 12:06 mvega $
  */
 @Data
-public class ClassRoom {
-    private Subject subject;
-    private Teacher teacher;
-    private List<Student> students;
-    public ClassRoom(){
-
+public class Teacher extends Person{
+    private Subject[] subjects;
+    public Teacher(Subject... assignations){
+        this.subjects = subjects;
     }
 }

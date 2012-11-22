@@ -21,6 +21,7 @@ package jdbc;
 
 import com.google.common.io.Resources;
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.log4j.Logger;
 import org.dbunit.DataSourceDatabaseTester;
 import org.dbunit.IDatabaseTester;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
@@ -36,11 +37,17 @@ import static com.google.common.io.Resources.getResource;
 
 /**
  * @author Miguel Vega
- * @version $Id: DefaultTest.java 1, 2012-10-05 10:10 AM mvega $
+ * @version $Id: TestStub.java 1, 2012-10-05 10:10 AM mvega $
  */
-public abstract class DefaultTest {
+public abstract class TestStub {
     protected static IDatabaseTester databaseTester;
     protected static BasicDataSource basicDataSource;
+
+    protected Logger logger;
+
+    TestStub(){
+        this.logger = Logger.getLogger(getClass());
+    }
 
     @BeforeClass
     public static void init() throws Exception {
@@ -48,11 +55,11 @@ public abstract class DefaultTest {
         basicDataSource.setUrl("jdbc:h2:mem:parametrostest");
         basicDataSource.setDriverClassName("org.h2.Driver");
         Connection connection = basicDataSource.getConnection();
-        URL sql = getResource(DefaultTest.class, "students.sql");
+        URL sql = getResource(TestStub.class, "students.sql");
         connection.createStatement().execute(Resources.toString(sql, US_ASCII));
         connection.close();
 
-        URL resource = getResource(DefaultTest.class, "students.xml");
+        URL resource = getResource(TestStub.class, "students.xml");
         FlatXmlDataSet build = new FlatXmlDataSetBuilder().build(resource);
         databaseTester = new DataSourceDatabaseTester(basicDataSource);
         databaseTester.setDataSet(build);

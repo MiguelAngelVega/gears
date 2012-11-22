@@ -67,15 +67,30 @@ public abstract class DataStore {
     }
 
     /**
+     *
+     * @param query
+     * @return
+     * @throws SQLException
+     */
+    public int[] update(BatchQuery query) throws SQLException {
+        try {
+            return query.getPreparedStatement().executeBatch();
+        } finally {
+            closeConnection();
+            query.clearCache();
+        }
+    }
+
+    /**
      * Executes the given statement
      *
      * @param query
      */
-    public void update(Query query) throws SQLException {
+    public int update(Query query) throws SQLException {
         List p = Lists.newLinkedList();
         String queryString = query.evaluateQueryString(this, p);
         try {
-            update(queryString, p);
+            return update(queryString, p);
         } finally {
             p.clear();
         }
@@ -106,9 +121,11 @@ public abstract class DataStore {
      */
     public <T> void select(Query query, Class<?> resultType, ObjectResultSetHandler<? extends T> visitor) throws SQLException {
         List params = Lists.newLinkedList();
-        BeanResultHandler toBeanResultHandler = new BeanResultHandler(visitor, resultType);
+
         String queryString = query.evaluateQueryString(this, params);
+
         try {
+            BeanResultHandler toBeanResultHandler = new BeanResultHandler(visitor, resultType);
             query(queryString, toBeanResultHandler, params);
         } finally {
             params.clear();
@@ -128,10 +145,10 @@ public abstract class DataStore {
         String queryString = query.evaluateQueryString(this, params);
         try {
             query(queryString, toBeanResultHandler, params);
+            return builder.build();
         } finally {
             params.clear();
         }
-        return builder.build();
     }
 
     /**
@@ -153,16 +170,16 @@ public abstract class DataStore {
 
         try {
             query(queryString, toBeanResultHandler, params);
+            return builder.build();
         } finally {
             params.clear();
             params = null;
         }
-        return builder.build();
     }
 
     /**
      * This method evaluates the given query string and replaces the parameters marked as '?'
-     * in the same order that the provided objects.
+     * in the same order parameters were provided.
      *
      * @param query
      * @param resultVisitor
@@ -172,26 +189,49 @@ public abstract class DataStore {
      */
     public <T> T select(String query, final ResultSetHandler<T> resultVisitor, Object... parameters) throws SQLException {
 
+        return query(query, new ResultSetHandler<T>() {
+            @Override
+            public T handle(ResultSet rs) throws SQLException {
+                return resultVisitor.handle(rs);
+            }
+        }, Lists.newLinkedList());
+
+    }
+
+    /**
+     * Executes the given statement using the {@link org.apache.commons.dbutils.QueryRunner} class
+     *
+     * @param query
+     * @param handler
+     * @param data
+     * @param <E>
+     * @return
+     * @throws SQLException
+     */
+    private <E> E query(String query, ResultSetHandler<E> handler, List data) throws SQLException {
         try {
-            return query(query, new ResultSetHandler<T>() {
-                @Override
-                public T handle(ResultSet rs) throws SQLException {
-                    return resultVisitor.handle(rs);
-                }
-            }, Lists.newLinkedList());
+            QueryRunner qr = new QueryRunner();
+            return qr.query(getConnection(), query, handler, data.toArray());
         } finally {
             closeConnection();
         }
     }
 
-    private <E> E query(String query, ResultSetHandler<E> handler, List data) throws SQLException {
-        QueryRunner qr = new QueryRunner();
-        return qr.query(getConnection(), query, handler, data.toArray());
-    }
-
+    /**
+     * Executes the given statement using the {@link org.apache.commons.dbutils.QueryRunner} class
+     *
+     * @param query
+     * @param data
+     * @return
+     * @throws SQLException
+     */
     private int update(String query, List data) throws SQLException {
-        QueryRunner qr = new QueryRunner();
-        return qr.update(getConnection(), query, data.toArray());
+        try {
+            QueryRunner qr = new QueryRunner();
+            return qr.update(getConnection(), query, data.toArray());
+        } finally {
+            closeConnection();
+        }
     }
 
     /**
@@ -201,17 +241,21 @@ public abstract class DataStore {
      * @param params
      * @return
      * @throws SQLException
-     * @deprecated used in the older version of the CoreJavaBeans
      */
-    @Deprecated
-    private PreparedStatement prepareStatement(String preparedSql, List params) throws SQLException {
+    protected PreparedStatement newPreparedStatement(String preparedSql, List params) throws SQLException {
         Connection conn = acquireConnection();
         PreparedStatement preparedSt = conn.prepareStatement(preparedSql);
+        return populatePreparedStatement(preparedSt, params);
+    }
+
+    protected PreparedStatement populatePreparedStatement(PreparedStatement preparedStatement, List params) throws SQLException {
+
+        //preparedStatement.clearParameters();
         for (int i = 0; i < params.size(); i++) {
             Object object = params.get(i);
-            preparedSt.setObject(i + 1, object);
+            preparedStatement.setObject(i + 1, object);
         }
-        return preparedSt;
+        return preparedStatement;
     }
 
     /**
@@ -223,7 +267,7 @@ public abstract class DataStore {
      * @deprecated Used in an older version of teh CoreJavaBeans, but maybe useful yet, unitil find more features
      */
     @Deprecated
-    public <T> T select(PreparedStatement preparedSt, ResultSetHandler<? extends T> handler) throws SQLException {
+    protected <T> T select(PreparedStatement preparedSt, ResultSetHandler<? extends T> handler) throws SQLException {
         logger.debug("Attempting to execute a preparedStatement QUERY: " + preparedSt + ", mapped to ");
         ResultSet rs = null;
         try {

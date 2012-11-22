@@ -143,9 +143,12 @@ public class BeanResultHandler<T> implements ResultSetHandler{
                         value = resultSet.getObject(columnName);
                         method.invoke(obj, value);
                     } catch (IllegalArgumentException ex) {
+                        if(value==null){
+                            continue;
+                        }
                         logger.debug("Type found in database is '"+value.getClass().getName()+"', but target object requires '"+field.getType().getName()+"': "+ex.getLocalizedMessage());
                         //if this is thrown the try to fix this error using the following:
-                        //If is a big decimal, maybe bean has double or float attributes
+                        //If is a big decimal, maybe pojo has double or float attributes
                         try {
                             if (value instanceof BigDecimal || value instanceof Number) {
                                 if (Double.class.isAssignableFrom(field.getType())

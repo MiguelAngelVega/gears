@@ -62,7 +62,7 @@ public class ExpressionTransformerImpl implements ExpressionTransformer<String, 
      * Need to transform the four possibilities:
      * 1. dictionary.attribute...
      * 2. map.attribute...
-     * 3. bean.param...
+     * 3. pojo.param...
      * 4. primitive
      *
      * @param textToEvaluate
@@ -99,7 +99,7 @@ public class ExpressionTransformerImpl implements ExpressionTransformer<String, 
         String getter = null;
         try {
             Method method;
-            //it's supposed to be n existing field in the given {@link bean}
+            //it's supposed to be n existing field in the given {@link pojo}
             try {
                 Field field = context.getClass().getDeclaredField(attr);
                 getter = getGetterName(context.getClass().getDeclaredField(attr));

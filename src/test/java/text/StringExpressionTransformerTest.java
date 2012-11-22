@@ -19,9 +19,9 @@
 
 package text;
 
-import bean.ClassRoom;
-import bean.Student;
-import bean.Teacher;
+import pojo.ClassRoom;
+import pojo.Student;
+import pojo.Teacher;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Assert;
 import org.junit.Test;

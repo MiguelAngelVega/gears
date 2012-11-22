@@ -19,7 +19,7 @@
 
 package jdbc;
 
-import bean.Student;
+import pojo.Student;
 import com.google.common.collect.Lists;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.log4j.Logger;
@@ -36,10 +36,9 @@ import static junit.framework.Assert.assertTrue;
 
 /**
  * @author Miguel Vega
- * @version $Id: QueryTest.java 0, 2012-11-14 5:49 PM mvega $
+ * @version $Id: SelectTest.java 0, 2012-11-14 5:49 PM mvega $
  */
-public class QueryTest extends DefaultTest {
-    Logger logger = Logger.getLogger(QueryTest.class);
+public class SelectTest extends TestStub {
 
     @Test
     public void objectResultVisitorTest(){
@@ -54,7 +53,7 @@ public class QueryTest extends DefaultTest {
             ds.select(query, Student.class, new ObjectResultSetHandler<Student>() {
                 @Override
                 public void handle(Student result) throws SQLException {
-                    logger.info(">>>>>>>>>id="+result.getId()+", rate="+result.getRate()+", addDate="+result.getAddDate());
+                    logger.info("POJO > "+result.toString());
                 }
             });
         } catch (SQLException e) {
@@ -65,7 +64,7 @@ public class QueryTest extends DefaultTest {
         try {
             List<Map<String, Object>> results = ds.select(query);
             for (Map<String, Object> res:results){
-                System.out.println("*****************************"+res+", rate="+res.get("STD_ID").getClass());
+                System.out.println("MAP > "+res+", rate="+res.get("STD_ID").getClass());
             }
         } catch (SQLException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -75,7 +74,7 @@ public class QueryTest extends DefaultTest {
         try {
             List<Student> stds = ds.select(query, Student.class);
             for (Student std:stds){
-                System.out.println("--------------------------"+std);
+                System.out.println("LIST POJOS > "+std);
             }
         } catch (SQLException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.

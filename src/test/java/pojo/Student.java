@@ -17,18 +17,22 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package bean;
+package pojo;
 
 import lombok.Data;
+import lombok.ToString;
+import org.openlogics.gears.jdbc.annotations.ColumnRef;
+
+import java.sql.Timestamp;
 
 /**
  * @author Miguel Vega
- * @version $Id: Teacher.java 0, 2012-09-29 12:06 mvega $
+ * @version $Id: Student.java 0, 2012-09-29 12:00 mvega $
  */
 @Data
-public class Teacher extends Person{
-    private Subject[] subjects;
-    public Teacher(Subject... assignations){
-        this.subjects = subjects;
-    }
+@ToString(callSuper = true)
+public class Student extends Person{
+    private float rate;
+    @ColumnRef("std_add_date")
+    private Timestamp addDate;
 }

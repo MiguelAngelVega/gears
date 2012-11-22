@@ -17,7 +17,7 @@ Features.
     - select(query, SimpleResultVisitor<T>, Object...), retuns object of type T, replaces the query mapped with ?
             in the same oreder that parameters are sent.
     - select(query, Object context, SimpleResultVisitor<T>), returns a T object, but uses the values contained in
-            the context object (bean, map, dictionary)
+            the context object (pojo, map, dictionary)
     - void select(query, ObjectResultVisitor<T>, Object...
     - void select(query, Object context, ObjectResultVisitor<T>)
     - T selectOne(query, Class<T>, Object...)

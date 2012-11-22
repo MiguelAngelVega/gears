@@ -1,5 +1,5 @@
 /*
- *     JavaTools
+ *     gears
  *     http://www.open-logics.com
  *     Copyright (C) 2012, OpenLogics
  *
@@ -17,26 +17,22 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package bean;
+package pojo;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import org.openlogics.gears.jdbc.annotations.ColumnRef;
+import lombok.Data;
+
+import java.util.List;
 
 /**
  * @author Miguel Vega
- * @version $Id: Person.java 0, 2012-09-29 12:00 mvega $
+ * @version $Id: ClassRoom.java 0, 2012-09-29 12:04 mvega $
  */
-@ToString
-public class Person {
-    @Getter @Setter
-    @ColumnRef("STD_FNAME")
-    protected String fname;
-    @Getter @Setter
-    @ColumnRef("STD_LNAME")
-    protected String lname;
-    @Getter @Setter
-    @ColumnRef("STD_ID")
-    protected long id;
+@Data
+public class ClassRoom {
+    private Subject subject;
+    private Teacher teacher;
+    private List<Student> students;
+    public ClassRoom(){
+
+    }
 }
