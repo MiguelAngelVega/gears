@@ -2,6 +2,7 @@ package jdbc;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.dbutils.ResultSetHandler;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openlogics.gears.jdbc.DataStore;
 import org.openlogics.gears.jdbc.JdbcDataStore;
@@ -16,6 +17,7 @@ import java.sql.SQLException;
  */
 public class PostgresqlTest {
     @Test
+    @Ignore
     public void longQuery(){
         BasicDataSource bds = new BasicDataSource();
         bds.setUrl("jdbc:postgresql://localhost:5432/geodata");
