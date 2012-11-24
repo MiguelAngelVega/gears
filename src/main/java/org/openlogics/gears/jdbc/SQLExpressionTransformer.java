@@ -30,15 +30,14 @@ import java.util.regex.Pattern;
  * @author Miguel Vega
  * @version $Id: SQLExpressionTransformer.java 0, 2012-11-14 3:08 PM mvega $
  */
-public class SQLExpressionTransformer implements ExpressionTransformer<String, Object>{
+public class SQLExpressionTransformer implements ExpressionTransformer<String, Object> {
     static final String PATTERN = "[{][a-zA-Z0-9_.$]*[}]";
     private String prefix;
 
     /**
-     *
      * @param prefix prefix used to delimit parameters in a query string
      */
-    SQLExpressionTransformer(String prefix){
+    SQLExpressionTransformer(String prefix) {
         if (prefix == null) {
             throw new IllegalArgumentException("SQL");
         }
@@ -47,17 +46,19 @@ public class SQLExpressionTransformer implements ExpressionTransformer<String, O
 
     /**
      * When a query string contains ${param}, this will be simply replaced by the object provided by the context object.
+     *
      * @return a transformer to transform static parameter replacement in query string.
      */
-    public static final SQLExpressionTransformer buildStaticTransformer(){
+    public static final SQLExpressionTransformer buildStaticTransformer() {
         return new SQLExpressionTransformer("$");
     }
 
     /**
      * When a query string contains ${param}, this will be processed by the object provided by the context object.
+     *
      * @return
      */
-    public static final SQLExpressionTransformer buildDynamicTransformer(){
+    public static final SQLExpressionTransformer buildDynamicTransformer() {
         return new SQLExpressionTransformer("#");
     }
 
@@ -109,18 +110,15 @@ public class SQLExpressionTransformer implements ExpressionTransformer<String, O
             String key = matcher.group().replace(prefix + "{", "").replace("}", "");
             int start = matcher.start();
             int end = matcher.end();
-            try {
-                //Object obj = getValueFromContext(context, key);
-                Object obj = jbe.transform(key, context);
-                matcher.appendReplacement(result, fixedValue != null ? fixedValue : String.valueOf(obj));
-                visitor.handle(obj);
-            } catch (IllegalArgumentException x) {
-                logger.debug("ERROR ExperssionLanguage Evaluation:" + x.getMessage());
-            }
+            //Object obj = getValueFromContext(context, key);
+            Object obj = jbe.transform(key, context);
+            matcher.appendReplacement(result, fixedValue != null ? fixedValue : String.valueOf(obj));
+            visitor.handle(obj);
         }
         matcher.appendTail(result);
         return result.toString();
     }
+
     protected interface ParameterParsedHandler {
         void handle(Object param);
     }

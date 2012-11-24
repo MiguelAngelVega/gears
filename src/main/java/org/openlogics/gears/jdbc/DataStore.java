@@ -150,32 +150,6 @@ public abstract class DataStore {
     }
 
     /**
-     * @param query
-     * @return
-     * @throws SQLException
-     */
-    public List<Map<String, Object>> select(Query query) throws SQLException {
-        final ImmutableList.Builder<Map<String, Object>> builder = new ImmutableList.Builder<Map<String, Object>>();
-        ObjectResultSetHandler<Map<String, Object>> handler = new ObjectResultSetHandler<Map<String, Object>>() {
-            @Override
-            public void handle(Map<String, Object> result) throws SQLException {
-                builder.add(result);
-            }
-        };
-        BeanResultHandler toBeanResultHandler = new BeanResultHandler(handler, Map.class);
-        List params = Lists.newLinkedList();
-        String queryString = query.evaluateQueryString(this, params);
-
-        try {
-            query(queryString, toBeanResultHandler, params);
-            return builder.build();
-        } finally {
-            params.clear();
-            params = null;
-        }
-    }
-
-    /**
      * This method evaluates the given query string and replaces the parameters marked as '?'
      * in the same order parameters were provided.
      *

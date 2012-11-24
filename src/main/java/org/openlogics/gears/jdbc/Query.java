@@ -22,6 +22,7 @@ package org.openlogics.gears.jdbc;
 import com.google.common.base.Strings;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -32,20 +33,13 @@ import java.util.List;
 public class Query{
     private String queryString;
     protected Object context;
-    /**
-     * Default constructor to build simple queries
-     * @param queryString
-     */
-    public Query(String queryString){
-        this(queryString, null);
-    }
 
     /**
      * Constructor which supports SQL statement plus the context of where to retrieve data from
      * @param queryString a supported SQL statement. Can contains ?, #{}, or ${} keywords
      * @param context the object to retrieve data from
      */
-    public Query(String queryString, Object context){
+    public Query(String queryString, Object... context){
         this.queryString = queryString;
         this.context = context;
     }
@@ -80,15 +74,17 @@ public class Query{
         SQLExpressionTransformer el = SQLExpressionTransformer.buildStaticTransformer();
         //simple access
         localQueryString = el.transform(localQueryString, context);
-        //System.out.println("Evaluated........1....."+complexQuery);
         el = SQLExpressionTransformer.buildDynamicTransformer();
-        //when got an input-required, visitor visits with the item found
         localQueryString = el.evaluateFixedParameter(localQueryString, context, "?", new SQLExpressionTransformer.ParameterParsedHandler() {
             @Override
             public void handle(Object obj) {
                 data.add(obj);
             }
         });
+        //in the case that query is being used as the common DBUtils String and parameters, this will solve such that problem
+        if(data.size()==0 && context!=null && context.getClass().isArray()){
+            data.addAll(Arrays.asList((Object[])context));
+        }
         return localQueryString;
     }
 }

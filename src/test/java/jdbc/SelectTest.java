@@ -19,6 +19,8 @@
 
 package jdbc;
 
+import org.apache.commons.dbutils.handlers.MapHandler;
+import org.apache.commons.dbutils.handlers.MapListHandler;
 import pojo.Student;
 import com.google.common.collect.Lists;
 import org.apache.commons.dbutils.ResultSetHandler;
@@ -31,14 +33,24 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.*;
 
 /**
  * @author Miguel Vega
  * @version $Id: SelectTest.java 0, 2012-11-14 5:49 PM mvega $
  */
 public class SelectTest extends TestStub {
+
+    @Test
+    public void plainQueryTest(){
+        DataStore ds = new JdbcDataStore(basicDataSource);
+        try {
+            List<Map<String, Object>> list = ds.select(new Query("select * from dis_students where std_id between ? AND ? ", 1, 3), new MapListHandler());
+            assertEquals(3, list.size());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Test
     public void objectResultVisitorTest(){
@@ -62,7 +74,7 @@ public class SelectTest extends TestStub {
 
         //
         try {
-            List<Map<String, Object>> results = ds.select(query);
+            List<Map<String, Object>> results = ds.select(query, new MapListHandler());
             for (Map<String, Object> res:results){
                 System.out.println("MAP > "+res+", rate="+res.get("STD_ID").getClass());
             }
@@ -112,7 +124,7 @@ public class SelectTest extends TestStub {
     public void testContextQuery() throws SQLException {
         DataStore ds = new JdbcDataStore(basicDataSource);
 
-        Query query = new Query("select * from dis_students where STD_ID = #{id}", 2);
+        Query query = new Query("select * from dis_students where STD_ID = ?", 2);
 
         List<Object> result = ds.select(query, new ResultSetHandler<List<Object>>() {
             @Override
@@ -133,5 +145,13 @@ public class SelectTest extends TestStub {
         for (Object o : result){
             logger.info("Found....."+o);
         }
+    }
+
+    @Test
+    public void singleSelectionTest() throws SQLException {
+        DataStore ds = new JdbcDataStore(basicDataSource);
+        Map<String, Object> res = ds.select(new Query("select * from dis_students where std_id = 1"), new MapHandler());
+        logger.info("Single Result: "+res);
+        assertNotNull(res);
     }
 }

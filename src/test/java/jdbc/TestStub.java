@@ -26,11 +26,12 @@ import org.dbunit.DataSourceDatabaseTester;
 import org.dbunit.IDatabaseTester;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 
 import java.net.URL;
 import java.sql.Connection;
+import java.sql.SQLException;
 
 import static com.google.common.base.Charsets.US_ASCII;
 import static com.google.common.io.Resources.getResource;
@@ -40,35 +41,41 @@ import static com.google.common.io.Resources.getResource;
  * @version $Id: TestStub.java 1, 2012-10-05 10:10 AM mvega $
  */
 public abstract class TestStub {
-    protected static IDatabaseTester databaseTester;
-    protected static BasicDataSource basicDataSource;
+    protected IDatabaseTester databaseTester;
+    protected BasicDataSource basicDataSource;
 
     protected Logger logger;
 
-    TestStub(){
+    @Before
+    public void setup(){
         this.logger = Logger.getLogger(getClass());
+
+        try {
+
+            basicDataSource = new BasicDataSource();
+            basicDataSource.setUrl("jdbc:h2:mem:parametrostest");
+            basicDataSource.setDriverClassName("org.h2.Driver");
+            Connection connection = basicDataSource.getConnection();
+            URL sql = getResource(TestStub.class, "students.sql");
+            try {
+                connection.createStatement().execute(Resources.toString(sql, US_ASCII));
+                connection.close();
+
+                URL resource = getResource(TestStub.class, "students.xml");
+                FlatXmlDataSet build = new FlatXmlDataSetBuilder().build(resource);
+                databaseTester = new DataSourceDatabaseTester(basicDataSource);
+                databaseTester.setDataSet(build);
+                databaseTester.onSetup();
+            } catch (SQLException x) {
+
+            }
+        } catch (Exception x) {
+            x.printStackTrace();
+        }
     }
 
-    @BeforeClass
-    public static void init() throws Exception {
-        basicDataSource = new BasicDataSource();
-        basicDataSource.setUrl("jdbc:h2:mem:parametrostest");
-        basicDataSource.setDriverClassName("org.h2.Driver");
-        Connection connection = basicDataSource.getConnection();
-        URL sql = getResource(TestStub.class, "students.sql");
-        connection.createStatement().execute(Resources.toString(sql, US_ASCII));
-        connection.close();
-
-        URL resource = getResource(TestStub.class, "students.xml");
-        FlatXmlDataSet build = new FlatXmlDataSetBuilder().build(resource);
-        databaseTester = new DataSourceDatabaseTester(basicDataSource);
-        databaseTester.setDataSet(build);
-
-        databaseTester.onSetup();
-    }
-
-    @AfterClass
-    public static void dispose() throws Exception {
+    @After
+    public void dispose() throws Exception {
         databaseTester.onTearDown();
         basicDataSource.close();
     }
