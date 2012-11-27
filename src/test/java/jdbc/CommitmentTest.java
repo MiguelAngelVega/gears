@@ -27,5 +27,7 @@ import org.junit.Test;
  */
 public class CommitmentTest {
     @Test
-    public void
+    public void testCommitmentTest(){
+
+    }
 }
