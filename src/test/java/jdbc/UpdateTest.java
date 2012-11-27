@@ -113,18 +113,4 @@ public class UpdateTest extends TestStub {
             e.printStackTrace();
         }
     }
-
-    private void viewAll(DataStore ds) throws SQLException {
-        logger.info(System.getProperty("line.separator"));
-        Query query = new Query("select STD_ID, " +
-                "STD_FNAME, " +
-                "STD_LNAME, " +
-                "STD_RATE as rate, " +
-                "STD_ADD_DATE from dis_students");
-        List<Student> stds = ds.select(query, Student.class);
-        for (Student std : stds) {
-            logger.info("Result > " + std);
-        }
-        logger.info(System.getProperty("line.separator"));
-    }
 }

@@ -74,7 +74,7 @@ public abstract class DataStore {
         try {
             return query.getPreparedStatement().executeBatch();
         } finally {
-            closeConnection();
+            closeDBConn();
             query.clearCache();
         }
     }
@@ -185,7 +185,7 @@ public abstract class DataStore {
             QueryRunner qr = new QueryRunner();
             return qr.query(getConnection(), query, handler, data.toArray());
         } finally {
-            closeConnection();
+            closeDBConn();
         }
     }
 
@@ -202,7 +202,7 @@ public abstract class DataStore {
             QueryRunner qr = new QueryRunner();
             return qr.update(getConnection(), query, data.toArray());
         } finally {
-            closeConnection();
+            closeDBConn();
         }
     }
 
@@ -249,7 +249,7 @@ public abstract class DataStore {
             if (rs != null) rs.close();
             DbUtils.close(preparedSt);
             if (isAutoClose()) {
-                closeConnection();
+                closeDBConn();
             }
         }
     }
@@ -260,8 +260,8 @@ public abstract class DataStore {
     }
 
     /**
-     * This automatically disables the auto-commit and auto-closeable features of the connection.
-     * <code>Warning!, Be sure to close the connection when finishing.</code>
+     * This automatically disables the auto-commit and auto-closeable (if FALSE) features of the connection.
+     * <br/><code>Warning!, Be sure to close the connection when finishing.</code>
      * @param autoCommit TRUE if commit per transaction is allowed
      */
     public synchronized void setAutoCommit(boolean autoCommit) {
@@ -300,8 +300,17 @@ public abstract class DataStore {
      * @throws SQLException
      */
     public void rollBack() throws SQLException {
-        if (connection != null)
+        if (connection != null){
             connection.rollback();
+        }
+    }
+
+    /**
+     *
+     * @throws SQLException
+     */
+    public void rollBackAndClose() throws SQLException {
+        DbUtils.rollbackAndClose(connection);
     }
 
     /**
@@ -311,7 +320,10 @@ public abstract class DataStore {
      * @return database connection
      */
     public Connection getConnection() throws SQLException {
-        this.connection = (connection != null && !connection.isClosed()) ? connection : acquireConnection();
+        if(connection == null || connection.isClosed()){
+            this.connection = null;
+            this.connection = acquireConnection();
+        }
         connection.setAutoCommit(autoCommit);
         if(transactionIsolation!=-1){
             connection.setTransactionIsolation(transactionIsolation);
@@ -332,7 +344,7 @@ public abstract class DataStore {
         this.connection = null;
     }
 
-    private void finish() throws SQLException {
+    private void closeDBConn() throws SQLException {
         if(autoClose){
             closeConnection();
         }
