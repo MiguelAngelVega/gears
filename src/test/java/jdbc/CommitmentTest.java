@@ -48,6 +48,8 @@ public class CommitmentTest extends TestStub {
         props.setProperty("driver","org.postgresql.Driver");
         //props.setProperty("ssl","true");
 
+
+
         DataStore ds = new JdbcDataStore(props);
         //DataStore ds = new JdbcDataStore(basicDataSource);
         ds.setAutoCommit(false);
