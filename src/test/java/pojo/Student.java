@@ -33,6 +33,6 @@ import java.sql.Timestamp;
 @ToString(callSuper = true)
 public class Student extends Person{
     private float rate;
-    @ColumnRef("std_add_date")
+    @ColumnRef("FOO_add_date")
     private Timestamp addDate;
 }

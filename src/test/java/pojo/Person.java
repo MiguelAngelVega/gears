@@ -31,12 +31,12 @@ import org.openlogics.gears.jdbc.annotations.ColumnRef;
 @ToString
 public class Person {
     @Getter @Setter
-    @ColumnRef("STD_FNAME")
+    @ColumnRef("FOO_FNAME")
     protected String fname;
     @Getter @Setter
-    @ColumnRef("STD_LNAME")
+    @ColumnRef("FOO_LNAME")
     protected String lname;
     @Getter @Setter
-    @ColumnRef("STD_ID")
+    @ColumnRef("FOO_ID")
     protected long id;
 }

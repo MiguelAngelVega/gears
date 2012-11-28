@@ -87,20 +87,22 @@ public abstract class TestStub {
 
     protected void viewAll(DataStore ds) throws SQLException {
         logger.info(System.getProperty("line.separator"));
-        Query query = new Query("select STD_ID, " +
-                "STD_FNAME, " +
-                "STD_LNAME, " +
-                "STD_RATE as rate, " +
-                "STD_ADD_DATE from dis_students");
+        Query query = new Query("select FOO_ID, " +
+                "FOO_FNAME, " +
+                "FOO_LNAME, " +
+                "FOO_RATE as rate, " +
+                "FOO_ADD_DATE from FOO");
         List<Student> stds = ds.select(query, Student.class);
+        logger.info("*****************************************************************************************");
         for (Student std : stds) {
             logger.info("Result > " + std);
         }
+        logger.info("*****************************************************************************************");
         logger.info(System.getProperty("line.separator"));
     }
 
     protected long countAll(DataStore ds) throws SQLException {
-        Query query = new Query("select COUNT(STD_ID) from dis_students");
+        Query query = new Query("select COUNT(FOO_ID) from FOO");
         return ds.select(query, new ScalarHandler<Long>(1));
     }
 }

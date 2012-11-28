@@ -50,22 +50,22 @@ public class JdbcDataStore extends DataStore{
     @Override
     protected Connection acquireConnection() throws SQLException {
         //check whether is properties or datasource available
+<<<<<<< HEAD
         if(dataSource!=null){
             return dataSource.getConnection();
         }else if(properties!=null){
+=======
+        Connection connection = null;
+        if(dataSource!=null)
+            connection = dataSource.getConnection();
+        else if(properties!=null){
+>>>>>>> 521b4db762caaa8f977bc0f8c1a236b3734bcd0a
             try {
                 logger.debug("Properties:"+properties);
                 if(!DbUtils.loadDriver(properties.getProperty(DRIVER))){
                     throw new SQLException("Unable to load driver: "+properties.get(DRIVER));
                 }
-
-                Connection c = DriverManager.getConnection(properties.getProperty(URL), properties);
-                c.setAutoCommit(isAutoCommit());
-                if(getTransactionIsolation() !=-1){
-                    c.setTransactionIsolation(getTransactionIsolation());
-                    logger.debug("Attempting to use a custom TRANSACTION ISOLATION, '"+ getTransactionIsolation() +"'");
-                }
-                return c;
+                connection = DriverManager.getConnection(properties.getProperty(URL), properties);
             } catch (NullPointerException ex) {
                 logger.error("An unespected error has ocurred.");
                 throw new SQLException("An unespected error has ocurred.", ex);
@@ -73,5 +73,12 @@ public class JdbcDataStore extends DataStore{
         }else{
             throw new IllegalStateException("Nor properties neither dataSource has been provided");
         }
+
+        connection.setAutoCommit(isAutoCommit());
+        if(getTransactionIsolation() !=-1){
+            connection.setTransactionIsolation(getTransactionIsolation());
+            logger.debug("Attempting to use a custom TRANSACTION ISOLATION, '"+ getTransactionIsolation() +"'");
+        }
+        return connection;
     }
 }

@@ -44,17 +44,17 @@ import static junit.framework.Assert.assertEquals;
 public class UpdateTest extends TestStub {
     @Test
     public void simpleUpdate() {
-        //TODO: Se debe tener la siguiente opcion: ds.update(new Query("UPDATE DIS_STUDENTS SET STD_FNAME = 'ARNOLD' WHERE STD_ID = ? AND STD_LNAME = ?", 5, 'PAYE'));
+        //TODO: Se debe tener la siguiente opcion: ds.update(new Query("UPDATE FOO SET FOO_FNAME = 'ARNOLD' WHERE FOO_ID = ? AND FOO_LNAME = ?", 5, 'PAYE'));
         DataStore ds = new JdbcDataStore(basicDataSource);
         try {
-            int count = ds.update(new Query("UPDATE DIS_STUDENTS SET STD_FNAME = 'ARNOLD' WHERE STD_ID = #{parameter}", 5));
+            int count = ds.update(new Query("UPDATE FOO SET FOO_FNAME = 'ARNOLD' WHERE FOO_ID = #{parameter}", 5));
 
-            Map<String, Object> result = ds.select(new Query("SELECT * FROM DIS_STUDENTS WHERE STD_ID = 5"), new MapHandler());
+            Map<String, Object> result = ds.select(new Query("SELECT * FROM FOO WHERE FOO_ID = 5"), new MapHandler());
 
             viewAll(ds);
 
             assertEquals(1, count);
-            assertEquals("ARNOLD", result.get("STD_FNAME"));
+            assertEquals("ARNOLD", result.get("FOO_FNAME"));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -69,19 +69,19 @@ public class UpdateTest extends TestStub {
             student.setFname("MAURICIO");
             student.setLname("RAMIREZ");
 
-            int count = ds.update(new Query("UPDATE DIS_STUDENTS SET STD_FNAME = #{fname}, STD_LNAME = #{lname} WHERE STD_ID = #{id}", student));
-            Map<String, Object> res = ds.select(new Query("SELECT * FROM DIS_STUDENTS WHERE STD_ID = #{id}", student), new MapHandler());
+            int count = ds.update(new Query("UPDATE FOO SET FOO_FNAME = #{fname}, FOO_LNAME = #{lname} WHERE FOO_ID = #{id}", student));
+            Map<String, Object> res = ds.select(new Query("SELECT * FROM FOO WHERE FOO_ID = #{id}", student), new MapHandler());
 
             viewAll(ds);
 
             logger.info("count " + count);
             logger.info("listMap.size()->" + res.size());
-            logger.info("get(\"STD_FNAME\")->" + res.get("STD_FNAME"));
-            logger.info("get(\"STD_LNAME\")->" + res.get("STD_LNAME"));
+            logger.info("get(\"FOO_FNAME\")->" + res.get("FOO_FNAME"));
+            logger.info("get(\"FOO_LNAME\")->" + res.get("FOO_LNAME"));
 
             assertEquals(1, count);
-            assertEquals("MAURICIO", res.get("STD_FNAME"));
-            assertEquals("RAMIREZ", res.get("STD_LNAME"));
+            assertEquals("MAURICIO", res.get("FOO_FNAME"));
+            assertEquals("RAMIREZ", res.get("FOO_LNAME"));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -96,19 +96,19 @@ public class UpdateTest extends TestStub {
             map.put("fname", "MAURICIO");
             map.put("lname", "RAMIREZ");
 
-            int count = ds.update(new Query("UPDATE DIS_STUDENTS SET STD_FNAME = #{fname}, STD_LNAME = #{lname} WHERE STD_ID = #{id}", map));
-            Map<String, Object> res = ds.select(new Query("SELECT * FROM DIS_STUDENTS WHERE STD_ID = #{id}", map), new MapHandler());
+            int count = ds.update(new Query("UPDATE FOO SET FOO_FNAME = #{fname}, FOO_LNAME = #{lname} WHERE FOO_ID = #{id}", map));
+            Map<String, Object> res = ds.select(new Query("SELECT * FROM FOO WHERE FOO_ID = #{id}", map), new MapHandler());
 
             viewAll(ds);
 
             logger.info("count->" + count);
             logger.info("listMap.size()->" + res.size());
-            logger.info("listMap.get(0).get(\"STD_FNAME\")->" + res.get("STD_FNAME"));
-            logger.info("listMap.get(0).get(\"STD_LNAME\")->" + res.get("STD_LNAME"));
+            logger.info("listMap.get(0).get(\"FOO_FNAME\")->" + res.get("FOO_FNAME"));
+            logger.info("listMap.get(0).get(\"FOO_LNAME\")->" + res.get("FOO_LNAME"));
 
             assertEquals(1, count);
-            assertEquals("MAURICIO", res.get("STD_FNAME"));
-            assertEquals("RAMIREZ", res.get("STD_LNAME"));
+            assertEquals("MAURICIO", res.get("FOO_FNAME"));
+            assertEquals("RAMIREZ", res.get("FOO_LNAME"));
         } catch(SQLException e) {
             e.printStackTrace();
         }

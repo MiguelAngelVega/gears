@@ -37,7 +37,7 @@ public class InsertTest extends TestStub {
             std.setRate(100);
             std.setAddDate(new Timestamp(currentTimeMillis()));
 
-            int count = ds.update(new Query("insert into dis_students (STD_FNAME, STD_LNAME, STD_RATE, STD_ADD_DATE) " +
+            int count = ds.update(new Query("insert into FOO (FOO_FNAME, FOO_LNAME, FOO_RATE, FOO_ADD_DATE) " +
                     "values " +
                     "(#{fname}, #{lname}, #{rate}, #{addDate})", std));
 
@@ -65,7 +65,7 @@ public class InsertTest extends TestStub {
                     "addDate", new Timestamp(currentTimeMillis())
             );
 
-            int count = ds.update(new Query("insert into dis_students (STD_FNAME, STD_LNAME, STD_RATE, STD_ADD_DATE) " +
+            int count = ds.update(new Query("insert into FOO (FOO_FNAME, FOO_LNAME, FOO_RATE, FOO_ADD_DATE) " +
                     "values " +
                     "(#{fname}, #{lname}, #{rate}, #{addDate})", map));
 
@@ -90,7 +90,7 @@ public class InsertTest extends TestStub {
         std.setRate(100);
         std.setAddDate(new Timestamp(currentTimeMillis()));
 
-        BatchQuery<Map<String, Object>> query = new BatchQuery<Map<String, Object>>("insert into dis_students (STD_FNAME, STD_LNAME, STD_RATE, STD_ADD_DATE)" +
+        BatchQuery<Map<String, Object>> query = new BatchQuery<Map<String, Object>>("insert into FOO (FOO_FNAME, FOO_LNAME, FOO_RATE, FOO_ADD_DATE)" +
                 " values " +
                 "(#{fname}, #{lname}, #{rate}, #{addDate})", ds);
         query.addBatch(ImmutableMap.<String, Object>of("fname", "User 1", "lname", "Last 1", "rate", 61f, "addDate", new Timestamp(currentTimeMillis()))).
