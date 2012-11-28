@@ -268,7 +268,7 @@ public abstract class DataStore {
         logger.warn("Attempting to modify the connection AUTO COMMIT type to: " + autoCommit+". This causes that auto close is disabled.");
         this.autoCommit = autoCommit;
         //if autocommit is false, is necessary that connection auto close becomes false
-        this.autoClose = !autoCommit?false:autoClose;
+        this.autoClose = autoCommit==false?false:autoClose;
     }
 
     /**
@@ -324,6 +324,7 @@ public abstract class DataStore {
             this.connection = null;
             this.connection = acquireConnection();
         }
+
         connection.setAutoCommit(autoCommit);
         if(transactionIsolation!=-1){
             connection.setTransactionIsolation(transactionIsolation);

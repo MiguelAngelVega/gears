@@ -50,9 +50,9 @@ public class JdbcDataStore extends DataStore{
     @Override
     protected Connection acquireConnection() throws SQLException {
         //check whether is properties or datasource available
-        if(dataSource!=null)
+        if(dataSource!=null){
             return dataSource.getConnection();
-        else if(properties!=null){
+        }else if(properties!=null){
             try {
                 logger.debug("Properties:"+properties);
                 if(!DbUtils.loadDriver(properties.getProperty(DRIVER))){

@@ -41,14 +41,18 @@ public class CommitmentTest extends TestStub{
         DataStore ds = new JdbcDataStore(basicDataSource);
         ds.setAutoCommit(false);
 
+
+        org.apache.commons.dbcp.PoolableConnection p;
+
         try {
-            assertEquals(5, countAll(ds));
 
             BatchQuery q = new BatchQuery("insert into dis_students (STD_FNAME, STD_LNAME) values (#{a}, #{b})", ds).
             addBatch(ImmutableMap.of("a", "miguel", "b", "vega")).
                     addBatch(ImmutableMap.of("a", "miguel", "b", "vega")).
                     addBatch(ImmutableMap.of("a", "miguel", "b", "vega")).
                     addBatch(ImmutableMap.of("a", "miguel", "b", "vega"));
+
+            assertEquals(5, countAll(ds));
 
             ds.update(q);
 
