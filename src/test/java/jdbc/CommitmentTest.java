@@ -19,15 +19,104 @@
 
 package jdbc;
 
+import com.google.common.collect.ImmutableMap;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.openlogics.gears.jdbc.BatchQuery;
+import org.openlogics.gears.jdbc.DataStore;
+import org.openlogics.gears.jdbc.JdbcDataStore;
+import org.openlogics.gears.jdbc.Query;
+
+import java.sql.SQLException;
+import java.util.Properties;
+
+import static junit.framework.Assert.assertEquals;
 
 /**
  * @author Miguel Vega
  * @version $Id: CommitmentTest.java 0, 2012-11-23 7:21 PM mvega $
  */
-public class CommitmentTest {
-    @Test
-    public void testCommitmentTest(){
+public class CommitmentTest extends TestStub {
 
+    @Test
+    public void largeInsertionTest() {
+
+        Properties props = new Properties();
+        props.setProperty("user","postgres");
+        props.setProperty("password","postgres");
+        props.setProperty("url","jdbc:postgresql://localhost:5432/foo");
+        props.setProperty("driver","org.postgresql.Driver");
+        //props.setProperty("ssl","true");
+
+        DataStore ds = new JdbcDataStore(props);
+        //DataStore ds = new JdbcDataStore(basicDataSource);
+        ds.setAutoCommit(false);
+
+        long curr = 0;
+
+        try {
+            //viewAll(ds);
+
+            curr = countAll(ds);
+            //assertEquals(5, countAll(ds));
+
+            BatchQuery q = new BatchQuery("insert into FOO (FOO_FNAME, FOO_LNAME) values (#{a}, #{b})", ds).
+                    addBatch(ImmutableMap.of("a", "miguel", "b", "vega")).
+                    addBatch(ImmutableMap.of("a", "miguel", "b", "vega")).
+                    addBatch(ImmutableMap.of("a", "miguel", "b", "vega")).
+                    addBatch(ImmutableMap.of("a", "miguel", "b", "vega"));
+            ds.update(q);
+
+
+            //ds.update(new Query("insert into FOO (FOO_FNAME, FOO_LNAME) values (#{a}, #{b})", ImmutableMap.of("a", "miguel", "b", "vega")));
+
+            //assertEquals(curr, countAll(ds));
+
+            ds.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                ds.rollBack();
+                //assertEquals(curr + 4, countAll(ds));
+                //
+                viewAll(ds);
+                ds.closeConnection();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Test
+    public void truncatedInsertionTest() {
+        DataStore ds = new JdbcDataStore(basicDataSource);
+        ds.setAutoCommit(false);
+
+        try {
+            assertEquals(5, countAll(ds));
+
+            BatchQuery q = new BatchQuery("insert into FOO (FOO_FNAME, FOO_LNAME) values (#{a}, #{b})", ds).
+                    addBatch(ImmutableMap.of("a", "miguel", "b", "vega")).
+                    addBatch(ImmutableMap.of("a", "miguel", "b", "vega")).
+                    addBatch(ImmutableMap.of("a", "miguel", "b", "vega")).
+                    addBatch(ImmutableMap.of("a-mmmm", "miguel", "b-can not be null", "vega"));
+
+            ds.update(q);
+
+            ds.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                ds.rollBack();
+                assertEquals(5, countAll(ds));
+                //
+                viewAll(ds);
+                ds.closeConnection();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

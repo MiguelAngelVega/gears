@@ -21,6 +21,7 @@ package jdbc;
 
 import com.google.common.io.Resources;
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.apache.log4j.Logger;
 import org.dbunit.DataSourceDatabaseTester;
 import org.dbunit.IDatabaseTester;
@@ -28,10 +29,14 @@ import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 import org.junit.After;
 import org.junit.Before;
+import org.openlogics.gears.jdbc.DataStore;
+import org.openlogics.gears.jdbc.Query;
+import pojo.Student;
 
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 import static com.google.common.base.Charsets.US_ASCII;
 import static com.google.common.io.Resources.getResource;
@@ -78,5 +83,26 @@ public abstract class TestStub {
     public void dispose() throws Exception {
         databaseTester.onTearDown();
         basicDataSource.close();
+    }
+
+    protected void viewAll(DataStore ds) throws SQLException {
+        logger.info(System.getProperty("line.separator"));
+        Query query = new Query("select FOO_ID, " +
+                "FOO_FNAME, " +
+                "FOO_LNAME, " +
+                "FOO_RATE as rate, " +
+                "FOO_ADD_DATE from FOO");
+        List<Student> stds = ds.select(query, Student.class);
+        logger.info("*****************************************************************************************");
+        for (Student std : stds) {
+            logger.info("Result > " + std);
+        }
+        logger.info("*****************************************************************************************");
+        logger.info(System.getProperty("line.separator"));
+    }
+
+    protected long countAll(DataStore ds) throws SQLException {
+        Query query = new Query("select COUNT(FOO_ID) from FOO");
+        return ds.select(query, new ScalarHandler<Long>(1));
     }
 }

@@ -41,7 +41,7 @@ public class Query{
      */
     public Query(String queryString, Object... context){
         this.queryString = queryString;
-        this.context = context;
+        this.context = context.length==1?context[0]:context.length==0?null:context;
     }
 
     @Override

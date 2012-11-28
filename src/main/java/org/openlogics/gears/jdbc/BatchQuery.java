@@ -1,6 +1,7 @@
 package org.openlogics.gears.jdbc;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.dbutils.DbUtils;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -45,6 +46,7 @@ public class BatchQuery <E> extends Query{
      */
     public void clearCache() throws SQLException {
         preparedStatement.clearParameters();
+        DbUtils.close(preparedStatement);
         this.preparedStatement = null;
         this.dataStore = null;
     }

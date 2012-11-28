@@ -45,7 +45,7 @@ public class SelectTest extends TestStub {
     public void plainQueryTest(){
         DataStore ds = new JdbcDataStore(basicDataSource);
         try {
-            List<Map<String, Object>> list = ds.select(new Query("select * from dis_students where std_id between ? AND ? ", 1, 3), new MapListHandler());
+            List<Map<String, Object>> list = ds.select(new Query("select * from FOO where FOO_id between ? AND ? ", 1, 3), new MapListHandler());
             assertEquals(3, list.size());
         } catch (SQLException e) {
             e.printStackTrace();
@@ -56,11 +56,11 @@ public class SelectTest extends TestStub {
     public void objectResultVisitorTest(){
         DataStore ds = new JdbcDataStore(basicDataSource);
 
-        Query query = new Query("select STD_ID, " +
-                "STD_FNAME, " +
-                "STD_LNAME, " +
-                "STD_RATE as rate, " +
-                "STD_ADD_DATE from dis_students");
+        Query query = new Query("select FOO_ID, " +
+                "FOO_FNAME, " +
+                "FOO_LNAME, " +
+                "FOO_RATE as rate, " +
+                "FOO_ADD_DATE from FOO");
         try {
             ds.select(query, Student.class, new ObjectResultSetHandler<Student>() {
                 @Override
@@ -76,7 +76,7 @@ public class SelectTest extends TestStub {
         try {
             List<Map<String, Object>> results = ds.select(query, new MapListHandler());
             for (Map<String, Object> res:results){
-                System.out.println("MAP > "+res+", rate="+res.get("STD_ID").getClass());
+                System.out.println("MAP > "+res+", rate="+res.get("FOO_ID").getClass());
             }
         } catch (SQLException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -98,9 +98,9 @@ public class SelectTest extends TestStub {
     public void resultVisitorTest() {
         DataStore ds = new JdbcDataStore(basicDataSource);
 
-        Query query = new Query("select * from dis_students");
+        Query query = new Query("select * from FOO");
         String result = query.toString();
-        assertEquals("select * from dis_students", result);
+        assertEquals("select * from FOO", result);
         logger.info("Result=" + result);
 
         try {
@@ -124,7 +124,7 @@ public class SelectTest extends TestStub {
     public void testContextQuery() throws SQLException {
         DataStore ds = new JdbcDataStore(basicDataSource);
 
-        Query query = new Query("select * from dis_students where STD_ID = ?", 2);
+        Query query = new Query("select * from FOO where FOO_ID = ?", 2);
 
         List<Object> result = ds.select(query, new ResultSetHandler<List<Object>>() {
             @Override
@@ -150,7 +150,7 @@ public class SelectTest extends TestStub {
     @Test
     public void singleSelectionTest() throws SQLException {
         DataStore ds = new JdbcDataStore(basicDataSource);
-        Map<String, Object> res = ds.select(new Query("select * from dis_students where std_id = 1"), new MapHandler());
+        Map<String, Object> res = ds.select(new Query("select * from FOO where FOO_id = 1"), new MapHandler());
         logger.info("Single Result: "+res);
         assertNotNull(res);
     }

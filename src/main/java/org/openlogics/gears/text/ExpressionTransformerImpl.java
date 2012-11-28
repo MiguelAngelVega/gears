@@ -89,7 +89,7 @@ public class ExpressionTransformerImpl implements ExpressionTransformer<String, 
         if (isWrapperType(context)) {
             return (T)context;
         }
-        else if (context instanceof Map) {
+        else if (Map.class.isAssignableFrom(context.getClass())) {
             return (T)((Map) context).get(attr);
         }
         else if (context instanceof Dictionary) {
