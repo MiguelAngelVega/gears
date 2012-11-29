@@ -215,7 +215,7 @@ public abstract class DataStore {
      * @throws SQLException
      */
     protected PreparedStatement newPreparedStatement(String preparedSql, List params) throws SQLException {
-        Connection conn = acquireConnection();
+        Connection conn = getConnection();
         PreparedStatement preparedSt = conn.prepareStatement(preparedSql);
         return populatePreparedStatement(preparedSt, params);
     }
@@ -264,7 +264,7 @@ public abstract class DataStore {
      * <br/><code>Warning!, Be sure to close the connection when finishing.</code>
      * @param autoCommit TRUE if commit per transaction is allowed
      */
-    public synchronized void setAutoCommit(boolean autoCommit) {
+    public void setAutoCommit(boolean autoCommit) {
         logger.warn("Attempting to modify the connection AUTO COMMIT type to: " + autoCommit+". This causes that auto close is disabled.");
         this.autoCommit = autoCommit;
         //if autocommit is false, is necessary that connection auto close becomes false
@@ -320,10 +320,12 @@ public abstract class DataStore {
      * @return database connection
      */
     public Connection getConnection() throws SQLException {
-        if(connection == null || connection.isClosed()){
-            this.connection = null;
-            this.connection = acquireConnection();
+        if(connection != null && !connection.isClosed()){
+            return connection;
         }
+
+        closeConnection();
+        this.connection = acquireConnection();
 
         connection.setAutoCommit(autoCommit);
         if(transactionIsolation!=-1){

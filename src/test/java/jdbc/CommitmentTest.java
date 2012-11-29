@@ -20,7 +20,6 @@
 package jdbc;
 
 import com.google.common.collect.ImmutableMap;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openlogics.gears.jdbc.BatchQuery;
 import org.openlogics.gears.jdbc.DataStore;
@@ -39,60 +38,47 @@ import static junit.framework.Assert.assertEquals;
 public class CommitmentTest extends TestStub {
 
     @Test
-    public void largeInsertionTest() {
+    public void testLargeInsertion() {
 
         Properties props = new Properties();
-        props.setProperty("user","postgres");
-        props.setProperty("password","postgres");
-        props.setProperty("url","jdbc:postgresql://localhost:5432/foo");
-        props.setProperty("driver","org.postgresql.Driver");
+        props.setProperty("user", "postgres");
+        props.setProperty("password", "postgres");
+        props.setProperty("url", "jdbc:postgresql://localhost:5432/foo");
+        props.setProperty("driver", "org.postgresql.Driver");
         //props.setProperty("ssl","true");
 
 
-
-        DataStore ds = new JdbcDataStore(props);
-        //DataStore ds = new JdbcDataStore(basicDataSource);
+        //DataStore ds = new JdbcDataStore(props);
+        DataStore ds = new JdbcDataStore(basicDataSource);
         ds.setAutoCommit(false);
 
-<<<<<<< HEAD
-
-        org.apache.commons.dbcp.PoolableConnection p;
-
-        try {
-=======
         long curr = 0;
 
         try {
-            //viewAll(ds);
->>>>>>> 521b4db762caaa8f977bc0f8c1a236b3734bcd0a
-
+            viewAll(ds);
             curr = countAll(ds);
             //assertEquals(5, countAll(ds));
-
+            /*
             BatchQuery q = new BatchQuery("insert into FOO (FOO_FNAME, FOO_LNAME) values (#{a}, #{b})", ds).
                     addBatch(ImmutableMap.of("a", "miguel", "b", "vega")).
                     addBatch(ImmutableMap.of("a", "miguel", "b", "vega")).
                     addBatch(ImmutableMap.of("a", "miguel", "b", "vega")).
                     addBatch(ImmutableMap.of("a", "miguel", "b", "vega"));
-<<<<<<< HEAD
 
-            assertEquals(5, countAll(ds));
-
-=======
->>>>>>> 521b4db762caaa8f977bc0f8c1a236b3734bcd0a
             ds.update(q);
+            */
 
+            assertEquals(curr, countAll(ds));
 
-            //ds.update(new Query("insert into FOO (FOO_FNAME, FOO_LNAME) values (#{a}, #{b})", ImmutableMap.of("a", "miguel", "b", "vega")));
-
+            ds.update(new Query("insert into FOO (FOO_FNAME, FOO_LNAME) values (#{a}, #{b})", ImmutableMap.of("a", "miguel", "b", "vega")));
             //assertEquals(curr, countAll(ds));
 
-            ds.commit();
+            //ds.commit();
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             try {
-                ds.rollBack();
+                //ds.rollBack();
                 //assertEquals(curr + 4, countAll(ds));
                 //
                 viewAll(ds);
@@ -104,7 +90,7 @@ public class CommitmentTest extends TestStub {
     }
 
     @Test
-    public void truncatedInsertionTest() {
+    public void testTruncatedInsertion() {
         DataStore ds = new JdbcDataStore(basicDataSource);
         ds.setAutoCommit(false);
 

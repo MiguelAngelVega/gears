@@ -31,17 +31,19 @@ import java.util.Properties;
  * @author Miguel Vega
  * @version $Id: JdbcDataStore.java 0, 2012-11-14 12:12 PM mvega $
  */
-public class JdbcDataStore extends DataStore{
+public class JdbcDataStore extends DataStore {
     public static final String DRIVER = "driver", URL = "url";
 
     //while using a JDBC data store, there are two possible ways where to take connection from.
     //Using a connection from properties or from a DataSource
     private Properties properties;
     private DataSource dataSource;
+
     public JdbcDataStore(Properties properties) {
         super();    //To change body of overridden methods use File | Settings | File Templates.
         this.properties = properties;
     }
+
     public JdbcDataStore(DataSource dataSource) {
         super();    //To change body of overridden methods use File | Settings | File Templates.
         this.dataSource = dataSource;
@@ -50,35 +52,28 @@ public class JdbcDataStore extends DataStore{
     @Override
     protected Connection acquireConnection() throws SQLException {
         //check whether is properties or datasource available
-<<<<<<< HEAD
-        if(dataSource!=null){
+        if (dataSource != null)
             return dataSource.getConnection();
-        }else if(properties!=null){
-=======
-        Connection connection = null;
-        if(dataSource!=null)
-            connection = dataSource.getConnection();
-        else if(properties!=null){
->>>>>>> 521b4db762caaa8f977bc0f8c1a236b3734bcd0a
+        else if (properties != null) {
             try {
-                logger.debug("Properties:"+properties);
-                if(!DbUtils.loadDriver(properties.getProperty(DRIVER))){
-                    throw new SQLException("Unable to load driver: "+properties.get(DRIVER));
+                logger.debug("Properties:" + properties);
+                if (!DbUtils.loadDriver(properties.getProperty(DRIVER))) {
+                    throw new SQLException("Unable to load driver: " + properties.get(DRIVER));
                 }
-                connection = DriverManager.getConnection(properties.getProperty(URL), properties);
+                return DriverManager.getConnection(properties.getProperty(URL), properties);
+                /*
+                connection.setAutoCommit(isAutoCommit());
+                if (getTransactionIsolation() != -1) {
+                    connection.setTransactionIsolation(getTransactionIsolation());
+                    logger.debug("Attempting to use a custom TRANSACTION ISOLATION, '" + getTransactionIsolation() + "'");
+                }
+                */
             } catch (NullPointerException ex) {
                 logger.error("An unespected error has ocurred.");
                 throw new SQLException("An unespected error has ocurred.", ex);
             }
-        }else{
+        } else {
             throw new IllegalStateException("Nor properties neither dataSource has been provided");
         }
-
-        connection.setAutoCommit(isAutoCommit());
-        if(getTransactionIsolation() !=-1){
-            connection.setTransactionIsolation(getTransactionIsolation());
-            logger.debug("Attempting to use a custom TRANSACTION ISOLATION, '"+ getTransactionIsolation() +"'");
-        }
-        return connection;
     }
 }
