@@ -42,10 +42,11 @@ import static junit.framework.Assert.*;
 public class SelectTest extends TestStub {
 
     @Test
-    public void plainQueryTest(){
+    public void testPlainQuery(){
         DataStore ds = new JdbcDataStore(basicDataSource);
         try {
-            List<Map<String, Object>> list = ds.select(new Query("select * from FOO where FOO_id between ? AND ? ", 1, 3), new MapListHandler());
+            List<Map<String, Object>> list = ds.select(new Query("select * from FOO where FOO_id between ? AND ? ", 1, 3),
+                    new MapListHandler());
             assertEquals(3, list.size());
         } catch (SQLException e) {
             e.printStackTrace();
@@ -53,7 +54,7 @@ public class SelectTest extends TestStub {
     }
 
     @Test
-    public void objectResultVisitorTest(){
+    public void testObjectResultVisitor(){
         DataStore ds = new JdbcDataStore(basicDataSource);
 
         Query query = new Query("select FOO_ID, " +
@@ -95,7 +96,7 @@ public class SelectTest extends TestStub {
     }
 
     @Test
-    public void resultVisitorTest() {
+    public void testResultHandler() {
         DataStore ds = new JdbcDataStore(basicDataSource);
 
         Query query = new Query("select * from FOO");
@@ -148,7 +149,7 @@ public class SelectTest extends TestStub {
     }
 
     @Test
-    public void singleSelectionTest() throws SQLException {
+    public void testSingleSelection() throws SQLException {
         DataStore ds = new JdbcDataStore(basicDataSource);
         Map<String, Object> res = ds.select(new Query("select * from FOO where FOO_id = 1"), new MapHandler());
         logger.info("Single Result: "+res);

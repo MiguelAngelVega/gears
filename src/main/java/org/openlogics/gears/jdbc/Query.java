@@ -82,8 +82,12 @@ public class Query{
             }
         });
         //in the case that query is being used as the common DBUtils String and parameters, this will solve such that problem
-        if(data.size()==0 && context!=null && context.getClass().isArray()){
-            data.addAll(Arrays.asList((Object[])context));
+        if(data.size()==0 && context!=null){
+            if(context.getClass().isArray()){
+                data.addAll(Arrays.asList((Object[])context));
+            }else{
+                data.add(context);
+            }
         }
         return localQueryString;
     }

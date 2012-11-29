@@ -45,7 +45,6 @@ public class BatchQuery <E> extends Query{
      * Executes the batch, and clears cache to prevent from memory leaks
      */
     public void clearCache() throws SQLException {
-        preparedStatement.clearParameters();
         DbUtils.close(preparedStatement);
         this.preparedStatement = null;
         this.dataStore = null;

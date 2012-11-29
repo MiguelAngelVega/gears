@@ -43,8 +43,7 @@ import static junit.framework.Assert.assertEquals;
 
 public class UpdateTest extends TestStub {
     @Test
-    public void simpleUpdate() {
-        //TODO: Se debe tener la siguiente opcion: ds.update(new Query("UPDATE FOO SET FOO_FNAME = 'ARNOLD' WHERE FOO_ID = ? AND FOO_LNAME = ?", 5, 'PAYE'));
+    public void testSimpleUpdate() {
         DataStore ds = new JdbcDataStore(basicDataSource);
         try {
             int count = ds.update(new Query("UPDATE FOO SET FOO_FNAME = 'ARNOLD' WHERE FOO_ID = #{parameter}", 5));
@@ -61,7 +60,7 @@ public class UpdateTest extends TestStub {
     }
 
     @Test
-    public void simplePojoUpdate() {
+    public void testSimplePojoUpdate() {
         DataStore ds = new JdbcDataStore(basicDataSource);
         try {
             Student student = new Student();
@@ -88,7 +87,7 @@ public class UpdateTest extends TestStub {
     }
 
     @Test
-    public void SimpleMapUpdate() {
+    public void testSimpleMapUpdate() {
          DataStore ds = new JdbcDataStore(basicDataSource);
         try {
             Map<String, Object> map = new HashMap<String, Object>();

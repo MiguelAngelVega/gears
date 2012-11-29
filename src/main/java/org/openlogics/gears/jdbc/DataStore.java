@@ -21,16 +21,16 @@ package org.openlogics.gears.jdbc;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import org.apache.commons.dbutils.AsyncQueryRunner;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
+import org.apache.commons.dbutils.handlers.MapListHandler;
 import org.apache.log4j.Logger;
 import org.openlogics.gears.jdbc.map.BeanResultHandler;
 
 import java.sql.*;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Miguel Vega
@@ -102,11 +102,11 @@ public abstract class DataStore {
      * @throws SQLException
      */
     public <T> T select(Query query, ResultSetHandler<? extends T> handler) throws SQLException {
-        //a simple list to hold data about query
+        //a simple list to hold data about select
         List params = Lists.newLinkedList();
         try {
             String queryString = query.evaluateQueryString(this, params);
-            return query(queryString, handler, params);
+            return select(queryString, handler, params);
         } finally {
             params.clear();
         }
@@ -124,7 +124,7 @@ public abstract class DataStore {
 
         try {
             BeanResultHandler toBeanResultHandler = new BeanResultHandler(visitor, resultType);
-            query(queryString, toBeanResultHandler, params);
+            select(queryString, toBeanResultHandler, params);
         } finally {
             params.clear();
         }
@@ -142,32 +142,11 @@ public abstract class DataStore {
         BeanResultHandler<T> toBeanResultHandler = new BeanResultHandler<T>(handler, type);
         String queryString = query.evaluateQueryString(this, params);
         try {
-            query(queryString, toBeanResultHandler, params);
+            select(queryString, toBeanResultHandler, params);
             return builder.build();
         } finally {
             params.clear();
         }
-    }
-
-    /**
-     * This method evaluates the given query string and replaces the parameters marked as '?'
-     * in the same order parameters were provided.
-     *
-     * @param query
-     * @param resultVisitor
-     * @param parameters
-     * @param <T>
-     * @return what visitor decides to return
-     */
-    public <T> T select(String query, final ResultSetHandler<T> resultVisitor, Object... parameters) throws SQLException {
-
-        return query(query, new ResultSetHandler<T>() {
-            @Override
-            public T handle(ResultSet rs) throws SQLException {
-                return resultVisitor.handle(rs);
-            }
-        }, Lists.newLinkedList());
-
     }
 
     /**
@@ -180,7 +159,7 @@ public abstract class DataStore {
      * @return
      * @throws SQLException
      */
-    private <E> E query(String query, ResultSetHandler<E> handler, List data) throws SQLException {
+    private <E> E select(String query, ResultSetHandler<E> handler, List data) throws SQLException {
         try {
             QueryRunner qr = new QueryRunner();
             return qr.query(getConnection(), query, handler, data.toArray());

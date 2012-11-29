@@ -21,6 +21,7 @@ package jdbc;
 
 import com.google.common.io.Resources;
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.dbutils.handlers.MapListHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.apache.log4j.Logger;
 import org.dbunit.DataSourceDatabaseTester;
@@ -37,6 +38,7 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import static com.google.common.base.Charsets.US_ASCII;
 import static com.google.common.io.Resources.getResource;
@@ -93,8 +95,10 @@ public abstract class TestStub {
                 "FOO_RATE as rate, " +
                 "FOO_ADD_DATE from FOO");
         List<Student> stds = ds.select(query, Student.class);
+        //List<Map<String, Object>> stds = ds.select(query, new MapListHandler());
         logger.info("*****************************************************************************************");
         for (Student std : stds) {
+        //for (Map<String, Object> std : stds) {
             logger.info("Result > " + std);
         }
         logger.info("*****************************************************************************************");

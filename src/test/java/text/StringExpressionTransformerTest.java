@@ -85,7 +85,7 @@ public class StringExpressionTransformerTest {
     }
 
     @Test
-    public void testBenaFromBean(){
+    public void testPojoFromPojo(){
         ExpressionTransformerImpl ele = new ExpressionTransformerImpl();
         ClassRoom cr = new ClassRoom();
         Teacher t = new Teacher();

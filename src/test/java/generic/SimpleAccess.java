@@ -1,6 +1,7 @@
 package generic;
 
 import com.sun.beans.TypeResolver;
+import org.apache.log4j.Logger;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
@@ -20,15 +21,17 @@ public class SimpleAccess {
         T var;
 
         Foo() {
+            Logger logger = Logger.getLogger(getClass());
+
             Type t = TypeResolver.resolveInClass(Foo.class, Foo.class);
-            System.out.println("........"+t.getClass());
+            logger.debug("........"+t.getClass());
             Field field = null;
             try {
                 field = Foo.class.getDeclaredField("var");
             } catch (NoSuchFieldException e) {
                 e.printStackTrace();
             }
-            System.out.println(field.getType()); // class java.lang.String.
+            logger.debug(field.getType()); // class java.lang.String.
         }
     }
 }

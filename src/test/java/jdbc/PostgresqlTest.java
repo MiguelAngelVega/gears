@@ -17,8 +17,8 @@ import java.sql.SQLException;
  */
 public class PostgresqlTest {
     @Test
-    @Ignore
-    public void longQuery(){
+    @Ignore("Just testing if connections are closed when they should")
+    public void testLongQuery(){
         BasicDataSource bds = new BasicDataSource();
         bds.setUrl("jdbc:postgresql://localhost:5432/geodata");
         bds.setDriverClassName("org.postgresql.Driver");

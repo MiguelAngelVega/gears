@@ -24,7 +24,7 @@ import static junit.framework.Assert.assertEquals;
  */
 public class InsertTest extends TestStub {
     @Test
-    public void simplePojoInsert() {
+    public void testSimplePojoInsert() {
         DataStore ds = new JdbcDataStore(basicDataSource);
 
         try {
@@ -51,7 +51,7 @@ public class InsertTest extends TestStub {
         }
     }
     @Test
-    public void simpleMapInsert() {
+    public void testSimpleMapInsert() {
         DataStore ds = new JdbcDataStore(basicDataSource);
 
         try {
