@@ -24,11 +24,14 @@ package google.guice.aop0;
  * @version $Id: VideoRentalTest.java 0, 2012-11-30 6:04 PM mvega $
  */
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.matcher.Matchers;
 import org.junit.Before;
 import org.junit.Test;
+import org.openlogics.gears.jdbc.annotations.TransactionObservable;
 
 import static org.junit.Assert.assertTrue;
 
@@ -40,8 +43,37 @@ public class VideoRentalTest {
     @Before
     public void setup() {
 
-        Injector injector = Guice.createInjector(new ExampleModule());
+        Injector injector = Guice.createInjector(new AbstractModule() {
+            @Override
+            public void configure() {
+                bindInterceptor(
+                        //subclassesOf(VideoRental.class),
+                        //any(),
+
+                        Matchers.any(),
+                        Matchers.annotatedWith(TransactionObservable.class),
+
+                        new TracingInterceptor());
+            }
+        });
+        //uses the default empty constructor to inject an instance of VideoRental into this test class
         injector.injectMembers(this);
+
+        //another way of doing it might be the following
+        /*
+        Injector injector = Guice.createInjector(new AbstractModule() {
+            @Override
+            public void configure() {
+                bindInterceptor(
+                        subclassesOf(VideoRental.class),
+                        any(),
+                        new TracingInterceptor());
+
+                bind(VideoRental.class).toInstance(new VideoRental(1));
+            }
+        });
+        injector.injectMembers(this);
+        */
     }
 
     @Test

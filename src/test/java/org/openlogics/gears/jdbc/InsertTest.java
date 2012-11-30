@@ -2,7 +2,8 @@ package org.openlogics.gears.jdbc;
 
 import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
-import pojo.Student;
+import pojo.Foo;
+import pojo.Foo;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -25,7 +26,7 @@ public class InsertTest extends TestStub {
 
             long icount = countAll(ds);
 
-            Student std = new Student();
+            Foo std = new Foo();
             std.setFname("Mr.");
             std.setLname("Bean");
             std.setRate(100);
@@ -78,7 +79,7 @@ public class InsertTest extends TestStub {
         DataStore ds = new JdbcDataStore(basicDataSource);
         ds.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
 
-        Student std = new Student();
+        Foo std = new Foo();
         std.setFname("Mr.");
         std.setLname("Bean");
         std.setRate(100);

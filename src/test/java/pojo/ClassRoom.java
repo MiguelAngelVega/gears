@@ -31,7 +31,7 @@ import java.util.List;
 public class ClassRoom {
     private Subject subject;
     private Teacher teacher;
-    private List<Student> students;
+    private List<Foo> foos;
     public ClassRoom(){
 
     }

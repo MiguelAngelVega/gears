@@ -21,7 +21,8 @@ package org.openlogics.gears.jdbc;
 
 import org.apache.commons.dbutils.handlers.MapHandler;
 import org.junit.Test;
-import pojo.Student;
+import pojo.Foo;
+import pojo.Foo;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -59,13 +60,13 @@ public class UpdateTest extends TestStub {
     public void testSimplePojoUpdate() {
         DataStore ds = new JdbcDataStore(basicDataSource);
         try {
-            Student student = new Student();
-            student.setId(5);
-            student.setFname("MAURICIO");
-            student.setLname("RAMIREZ");
+            Foo foo = new Foo();
+            foo.setId(5);
+            foo.setFname("MAURICIO");
+            foo.setLname("RAMIREZ");
 
-            int count = ds.update(new Query("UPDATE FOO SET FOO_FNAME = #{fname}, FOO_LNAME = #{lname} WHERE FOO_ID = #{id}", student));
-            Map<String, Object> res = ds.select(new Query("SELECT * FROM FOO WHERE FOO_ID = #{id}", student), new MapHandler());
+            int count = ds.update(new Query("UPDATE FOO SET FOO_FNAME = #{fname}, FOO_LNAME = #{lname} WHERE FOO_ID = #{id}", foo));
+            Map<String, Object> res = ds.select(new Query("SELECT * FROM FOO WHERE FOO_ID = #{id}", foo), new MapHandler());
 
             viewAll(ds);
 

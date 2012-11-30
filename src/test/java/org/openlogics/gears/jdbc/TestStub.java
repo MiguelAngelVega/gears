@@ -29,7 +29,8 @@ import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 import org.junit.After;
 import org.junit.Before;
-import pojo.Student;
+import pojo.Foo;
+import pojo.Foo;
 
 import java.net.URL;
 import java.sql.Connection;
@@ -90,10 +91,10 @@ public abstract class TestStub {
                 "FOO_LNAME, " +
                 "FOO_RATE as rate, " +
                 "FOO_ADD_DATE from FOO");
-        List<Student> stds = ds.select(query, Student.class);
+        List<Foo> stds = ds.select(query, Foo.class);
         //List<Map<String, Object>> stds = ds.select(query, new MapListHandler());
         logger.info("*****************************************************************************************");
-        for (Student std : stds) {
+        for (Foo std : stds) {
         //for (Map<String, Object> std : stds) {
             logger.info("Result > " + std);
         }

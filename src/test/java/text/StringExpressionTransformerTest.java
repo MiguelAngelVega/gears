@@ -20,7 +20,8 @@
 package text;
 
 import pojo.ClassRoom;
-import pojo.Student;
+import pojo.Foo;
+import pojo.Foo;
 import pojo.Teacher;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Assert;
@@ -65,10 +66,10 @@ public class StringExpressionTransformerTest {
     @Test
     public void testBeanFromMap(){
         ExpressionTransformerImpl ele = new ExpressionTransformerImpl();
-        Student st = new Student();
+        Foo st = new Foo();
         st.setFname("mike");
-        Map<String, Student> in = new ImmutableMap.Builder<String,Student>().put("st", st).build();
-        Student o = ele.transform("st", in);
+        Map<String, Foo> in = new ImmutableMap.Builder<String,Foo>().put("st", st).build();
+        Foo o = ele.transform("st", in);
         Assert.assertEquals(o.getFname(), "mike");
     }
 

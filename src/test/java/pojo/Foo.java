@@ -1,5 +1,5 @@
 /*
- * gears
+ *     JavaTools
  *     http://www.open-logics.com
  *     Copyright (C) 2012, OpenLogics
  *
@@ -17,25 +17,22 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package google.guice.aop0;
+package pojo;
+
+import lombok.Data;
+import lombok.ToString;
+import org.openlogics.gears.jdbc.annotations.ColumnRef;
+
+import java.sql.Timestamp;
 
 /**
  * @author Miguel Vega
- * @version $Id: ExampleModule.java 0, 2012-11-30 6:04 PM mvega $
+ * @version $Id: Student.java 0, 2012-09-29 12:00 mvega $
  */
-
-import com.google.inject.AbstractModule;
-
-import static com.google.inject.matcher.Matchers.any;
-import static com.google.inject.matcher.Matchers.subclassesOf;
-
-public class ExampleModule extends AbstractModule {
-
-    public void configure() {
-
-        bindInterceptor(
-                subclassesOf(VideoRental.class),
-                any(),
-                new TracingInterceptor());
-    }
+@Data
+@ToString(callSuper = true)
+public class Foo extends Person{
+    private float rate;
+    @ColumnRef("FOO_add_date")
+    private Timestamp addDate;
 }

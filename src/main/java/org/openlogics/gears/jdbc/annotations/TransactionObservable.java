@@ -28,9 +28,9 @@ import java.lang.annotation.Target;
  * This annotation will ensure that the transactions inside this block executes correctly, if a {@link java.sql.SQLException}
  * is thrown, the process inside wont be committed.
  * @author Miguel Vega
- * @version $Id: TransactionObserver.java 0, 2012-11-30 5:31 PM mvega $
+ * @version $Id: TransactionObservable.java 0, 2012-11-30 5:31 PM mvega $
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface TransactionObserver {
+public @interface TransactionObservable {
 }

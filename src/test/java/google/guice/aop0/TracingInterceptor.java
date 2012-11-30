@@ -39,12 +39,11 @@ public class TracingInterceptor implements MethodInterceptor {
         try {
             return invocation.proceed();
         } finally {
-            System.out.println(
-                    String.format(
-                            "Invocation of method %s() with parameters %s took %.1f ms.",
-                            invocation.getMethod().getName(),
-                            Arrays.toString(invocation.getArguments()),
-                            (System.nanoTime() - start) / 1000000.0));
+            System.out.println(String.format(
+                    "Invocation of method %s() with parameters %s took %.1f ms.",
+                    invocation.getMethod().getName(),
+                    Arrays.toString(invocation.getArguments()),
+                    (System.nanoTime() - start) / 1000000.0));
         }
     }
 

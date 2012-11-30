@@ -21,7 +21,8 @@ package org.openlogics.gears.jdbc;
 
 import org.apache.commons.dbutils.handlers.MapHandler;
 import org.apache.commons.dbutils.handlers.MapListHandler;
-import pojo.Student;
+import pojo.Foo;
+import pojo.Foo;
 import com.google.common.collect.Lists;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.junit.Test;
@@ -61,9 +62,9 @@ public class SelectTest extends TestStub {
                 "FOO_RATE as rate, " +
                 "FOO_ADD_DATE from FOO");
         try {
-            ds.select(query, Student.class, new ObjectResultSetHandler<Student>() {
+            ds.select(query, Foo.class, new ObjectResultSetHandler<Foo>() {
                 @Override
-                public void handle(Student result) throws SQLException {
+                public void handle(Foo result) throws SQLException {
                     logger.info("POJO > "+result.toString());
                 }
             });
@@ -83,8 +84,8 @@ public class SelectTest extends TestStub {
 
         //
         try {
-            List<Student> stds = ds.select(query, Student.class);
-            for (Student std:stds){
+            List<Foo> stds = ds.select(query, Foo.class);
+            for (Foo std:stds){
                 System.out.println("LIST POJOS > "+std);
             }
         } catch (SQLException e) {
