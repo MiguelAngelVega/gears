@@ -1,4 +1,4 @@
-package jdbc;
+package org.openlogics.gears.jdbc;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.dbutils.ResultSetHandler;

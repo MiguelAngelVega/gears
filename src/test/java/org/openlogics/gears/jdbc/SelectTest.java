@@ -17,16 +17,14 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package jdbc;
+package org.openlogics.gears.jdbc;
 
 import org.apache.commons.dbutils.handlers.MapHandler;
 import org.apache.commons.dbutils.handlers.MapListHandler;
 import pojo.Student;
 import com.google.common.collect.Lists;
 import org.apache.commons.dbutils.ResultSetHandler;
-import org.apache.log4j.Logger;
 import org.junit.Test;
-import org.openlogics.gears.jdbc.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

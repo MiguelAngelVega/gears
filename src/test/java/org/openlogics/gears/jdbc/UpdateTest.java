@@ -17,18 +17,14 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package jdbc;
+package org.openlogics.gears.jdbc;
 
 import org.apache.commons.dbutils.handlers.MapHandler;
 import org.junit.Test;
-import org.openlogics.gears.jdbc.DataStore;
-import org.openlogics.gears.jdbc.JdbcDataStore;
-import org.openlogics.gears.jdbc.Query;
 import pojo.Student;
 
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;

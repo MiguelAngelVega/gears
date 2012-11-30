@@ -23,7 +23,6 @@
             <scope>test</scope>
         </dependency>
 
-
         <!-- Database dependencies for testing -->
         <dependency>
             <groupId>commons-dbcp</groupId>
@@ -77,6 +76,23 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.9</version>
+        </dependency>
+        <dependency>
+            <groupId>aopalliance</groupId>
+            <artifactId>aopalliance</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <!--
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+            <version>3.0</version>
+        </dependency>
+        -->
+        <dependency>
+            <groupId>com.google.code.guice</groupId>
+            <artifactId>guice</artifactId>
+            <version>1.0</version>
         </dependency>
     </dependencies>
 

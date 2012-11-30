@@ -1,18 +1,12 @@
-package jdbc;
+package org.openlogics.gears.jdbc;
 
 import com.google.common.collect.ImmutableMap;
-import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.junit.Test;
-import org.openlogics.gears.jdbc.BatchQuery;
-import org.openlogics.gears.jdbc.DataStore;
-import org.openlogics.gears.jdbc.JdbcDataStore;
-import org.openlogics.gears.jdbc.Query;
 import pojo.Student;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.List;
 import java.util.Map;
 
 import static java.lang.System.currentTimeMillis;

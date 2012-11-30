@@ -17,11 +17,10 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package jdbc;
+package org.openlogics.gears.jdbc;
 
 import com.google.common.io.Resources;
 import org.apache.commons.dbcp.BasicDataSource;
-import org.apache.commons.dbutils.handlers.MapListHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.apache.log4j.Logger;
 import org.dbunit.DataSourceDatabaseTester;
@@ -30,15 +29,12 @@ import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 import org.junit.After;
 import org.junit.Before;
-import org.openlogics.gears.jdbc.DataStore;
-import org.openlogics.gears.jdbc.Query;
 import pojo.Student;
 
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 import static com.google.common.base.Charsets.US_ASCII;
 import static com.google.common.io.Resources.getResource;

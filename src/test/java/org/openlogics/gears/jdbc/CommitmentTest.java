@@ -17,17 +17,12 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package jdbc;
+package org.openlogics.gears.jdbc;
 
 import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
-import org.openlogics.gears.jdbc.BatchQuery;
-import org.openlogics.gears.jdbc.DataStore;
-import org.openlogics.gears.jdbc.JdbcDataStore;
-import org.openlogics.gears.jdbc.Query;
 
 import java.sql.SQLException;
-import java.util.Properties;
 
 import static junit.framework.Assert.assertEquals;
 
